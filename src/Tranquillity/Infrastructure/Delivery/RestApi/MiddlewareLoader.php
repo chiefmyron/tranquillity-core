@@ -6,7 +6,10 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi;
 
 use Psr\Log\LoggerInterface;
 use Slim\App;
+use Slim\Error\Renderers\PlainTextErrorRenderer;
 use Slim\Middleware\ContentLengthMiddleware;
+use Tranquillity\Infrastructure\Delivery\RestApi\Error\RestApiErrorHandler;
+use Tranquillity\Infrastructure\Delivery\RestApi\Error\Renderer\JsonApiErrorRenderer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\ProfilerMiddleware;
 
 class MiddlewareLoader
@@ -34,11 +37,10 @@ class MiddlewareLoader
         $app->add(ProfilerMiddleware::class);
         $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
 
-        // Add custom error renderer
-        /*$errorHandler = $errorMiddleware->getDefaultErrorHandler();
-        if (is_object($errorHandler) === true) {
-            $errorHandler->registerErrorRenderer('application/vnd.api+json', ErrorRenderer::class);
-            $errorHandler->forceContentType('application/vnd.api+json');
-        }*/
+        // Set up custom error handler
+        $responseErrorRenderer = new JsonApiErrorRenderer();
+        $logErrorRenderer = new PlainTextErrorRenderer();
+        $errorHandler = new RestApiErrorHandler($app->getResponseFactory(), $logger, $responseErrorRenderer, $logErrorRenderer);
+        $errorMiddleware->setDefaultErrorHandler($errorHandler);
     }
 }

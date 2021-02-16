@@ -7,6 +7,7 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\ServiceProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use DI\ContainerBuilder;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -32,13 +33,17 @@ class LoggerServiceProvider extends AbstractServiceProvider
                 switch (strtolower($config['type'])) {
                     case 'file-rotating':
                         $path = $config['options']['path'] . DIRECTORY_SEPARATOR . $config['options']['filename'];
+                        $formatter = new LineFormatter($config['options']['outputFormat'], $config['options']['dateFormat']);
                         $handler = new RotatingFileHandler($path, $config['options']['maxFiles'], $config['level']);
+                        $handler->setFormatter($formatter);
                         $logger->pushHandler($handler);
                         break;
                     case 'file':
                     default:
                         $path = $config['options']['path'] . DIRECTORY_SEPARATOR . $config['options']['filename'];
+                        $formatter = new LineFormatter($config['options']['outputFormat'], $config['options']['dateFormat']);
                         $handler = new StreamHandler($path, $config['level']);
+                        $handler->setFormatter($formatter);
                         $logger->pushHandler($handler);
                         break;
                 }
