@@ -10,6 +10,7 @@ use Tranquillity\Application\Service\Person\ListPeopleRequest;
 use Tranquillity\Application\Service\Person\ListPeopleService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
 use Tranquillity\Application\DataTransformer\JsonApi\PersonResourceCollectionDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 
 class ListPeopleAction extends AbstractListAction
@@ -31,8 +32,6 @@ class ListPeopleAction extends AbstractListAction
         );
 
         $people = $this->service->execute($listPeopleRequest, new PersonResourceCollectionDataTransformer($request));
-        $response->getBody()->write(json_encode($people));
-        $response = $response->withStatus(HttpStatusCodeEnum::OK);
-        return $response->withHeader('Content-Type', 'application/vnd.api+json');
+        return JsonApiResponder::writeResponse($response, $people, HttpStatusCodeEnum::OK);
     }
 }
