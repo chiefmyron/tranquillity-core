@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Tranquillity\Domain\Model\Person;
 
 use Tranquillity\Domain\Enum\EntityTypeEnum;
+use Tranquillity\Domain\Enum\ErrorCodeEnum;
+use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\DomainEntity;
 use Tranquillity\Domain\Validation\Notification;
-use Tranquillity\Domain\Validation\ValidationException;
 
 class Person extends DomainEntity
 {
@@ -152,7 +153,7 @@ class Person extends DomainEntity
 
         // Validate email address
         if (filter_var($this->emailAddress, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) === false) {
-            $errors->addItem("Email address is not valid");
+            $errors->addItem(ErrorCodeEnum::FIELD_VALIDATION_EMAIL_FORMAT, "Email address '{$this->emailAddress}' is not valid", 'pointer', '/data/attributes/emailAddress');
         }
 
         return $errors;

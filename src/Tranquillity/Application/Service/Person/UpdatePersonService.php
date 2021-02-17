@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Tranquillity\Application\Service\Person;
 
 use Tranquillity\Application\Service\ApplicationService;
+use Tranquillity\Domain\Exception\Person\PersonDoesNotExistException;
 use Tranquillity\Domain\Model\Person\Person;
 use Tranquillity\Domain\Model\Person\PersonId;
 use Tranquillity\Domain\Model\Person\PersonRepository;
+use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Domain\Validation\ValidationException;
 
 class UpdatePersonService implements ApplicationService
 {
@@ -26,11 +29,14 @@ class UpdatePersonService implements ApplicationService
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \Exception("A '" . CreatePersonRequest::class . "' must be supplied to this service!");
+            throw new \Exception("An '" . UpdatePersonRequest::class . "' must be supplied to this service!");
         }
 
         // Retrieve existing Person entity
         $person = $this->repository->findById(PersonId::create($request->id()));
+        if (is_null($person) == true) {
+            throw new PersonDoesNotExistException("No person exists with ID {$request->id()}", 'pointer', '/data/id');
+        }
 
         // Update Person entity with new details
         foreach ($request->getUpdatedAttributes() as $attributeName) {

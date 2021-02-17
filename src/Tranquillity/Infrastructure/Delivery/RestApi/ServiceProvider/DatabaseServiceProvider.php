@@ -44,7 +44,6 @@ class DatabaseServiceProvider extends AbstractServiceProvider
                 );
 
                 // Create Doctrine configuration
-                //$driver = new SimplifiedXmlDriver($options['mappings_dir']);
                 $driver = new XmlDriver($options['mappings_dir']);
                 $config->setMetadataDriverImpl($driver);
 

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Tranquillity\Application\Service\Person;
 
 use Tranquillity\Application\DataTransformer\PersonDataTransformer;
+use Tranquillity\Domain\Exception\Person\PersonDoesNotExistException;
 use Tranquillity\Domain\Model\Person\PersonId;
 use Tranquillity\Domain\Model\Person\PersonRepository;
+use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Domain\Validation\ValidationException;
 
 class ViewPersonService
 {
@@ -31,9 +34,15 @@ class ViewPersonService
 
         // Get paginated list of people
         $person = $this->repository->findById(PersonId::create($id));
-        $dataTransformer->write($person, $fields, $relatedResources);
+
+        // Retrieve existing Person entity
+        $person = $this->repository->findById(PersonId::create($request->id()));
+        if (is_null($person) == true) {
+            throw new PersonDoesNotExistException("No person exists with ID {$request->id()}", 'pointer', '/data/id');
+        }
 
         // Assemble the DTO for the response
+        $dataTransformer->write($person, $fields, $relatedResources);
         return $dataTransformer->read();
     }
 }

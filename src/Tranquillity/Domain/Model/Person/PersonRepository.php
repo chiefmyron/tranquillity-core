@@ -14,7 +14,7 @@ interface PersonRepository
 
     public function update(Person $person): void;
 
-    public function findById(PersonId $id): Person;
+    public function findById(PersonId $id): ?Person;
 
     public function list(array $filterConditions, array $sortConditions, int $pageNumber, int $pageSize): array;
 }

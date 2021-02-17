@@ -55,7 +55,7 @@ class DoctrinePersonRepository extends EntityRepository implements PersonReposit
         return $query->getResult();
     }
 
-    public function findById(PersonId $id): Person
+    public function findById(PersonId $id): ?Person
     {
         return $this->getEntityManager()->find(Person::class, $id);
     }
