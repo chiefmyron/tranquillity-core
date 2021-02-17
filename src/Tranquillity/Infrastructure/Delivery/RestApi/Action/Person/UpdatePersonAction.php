@@ -11,6 +11,7 @@ use Tranquillity\Application\Service\Person\UpdatePersonRequest;
 use Tranquillity\Application\Service\Person\UpdatePersonService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 use Tranquillity\Infrastructure\Enum\ResourceTypeEnum;
 
 class UpdatePersonAction
@@ -43,6 +44,7 @@ class UpdatePersonAction
         $txnService = new TransactionalService($this->service, $this->txnSession);
         $person = $txnService->execute($createPersonRequest, new PersonResourceObjectDataTransformer($request));
         $response->getBody()->write(json_encode($person));
+        $response = $response->withStatus(HttpStatusCodeEnum::OK);
         return $response->withHeader('Content-Type', 'application/vnd.api+json');
     }
 }
