@@ -44,8 +44,7 @@ class NotificationError
     ): self {
         // TODO: Add resource lookups for HTTP status code and title based on supplied application error code
         $status = ErrorCodeEnum::statusCode($code);
-        //$title = ErrorCodeEnum::title($code);
-        $title = '';
+        $title = ErrorCodeEnum::title($code);
 
         return new static(
             $status,

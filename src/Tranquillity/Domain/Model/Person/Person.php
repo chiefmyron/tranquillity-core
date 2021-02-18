@@ -151,6 +151,15 @@ class Person extends DomainEntity
     {
         $errors = new Notification();
 
+        // Check mandatory fields
+        $mandatoryFields = ['firstName', 'lastName', 'emailAddress'];
+        foreach ($mandatoryFields as $fieldName) {
+            if (trim($this->$fieldName) == '') {
+                $errors->addItem(ErrorCodeEnum::FIELD_VALIDATION_MANDATORY_VALUE_MISSING, "Mandatory field '{$fieldName}' has not been provided", 'pointer', "/data/attributes/{$fieldName}");
+            }
+        }
+
+
         // Validate email address
         if (filter_var($this->emailAddress, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) === false) {
             $errors->addItem(ErrorCodeEnum::FIELD_VALIDATION_EMAIL_FORMAT, "Email address '{$this->emailAddress}' is not valid", 'pointer', '/data/attributes/emailAddress');

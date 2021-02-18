@@ -7,6 +7,7 @@ namespace Tranquillity\Domain\Enum;
 final class ErrorCodeEnum
 {
     // Generic error codes
+    public const FIELD_VALIDATION_MANDATORY_VALUE_MISSING = '10000';
     public const FIELD_VALIDATION_EMAIL_FORMAT = '10001';
 
     // Entity-specific error codes
@@ -16,6 +17,7 @@ final class ErrorCodeEnum
     public static function statusCode(string $errorCode): int
     {
         switch ($errorCode) {
+            case static::FIELD_VALIDATION_MANDATORY_VALUE_MISSING:
             case static::FIELD_VALIDATION_EMAIL_FORMAT:
                 return HttpStatusCodeEnum::UNPROCESSABLE_ENTITY;
             case static::PERSON_DOES_NOT_EXIST:
