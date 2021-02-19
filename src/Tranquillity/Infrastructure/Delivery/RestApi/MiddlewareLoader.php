@@ -31,10 +31,10 @@ class MiddlewareLoader
         $logger = $container->get(LoggerInterface::class);
 
         // Register middlewares
+        $app->add(ProfilerMiddleware::class);
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
         $app->add(ContentLengthMiddleware::class);
-        $app->add(ProfilerMiddleware::class);
         $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
 
         // Set up custom error handler

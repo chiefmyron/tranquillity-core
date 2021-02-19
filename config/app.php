@@ -8,7 +8,7 @@ return [
     'env' => env('APP_ENV', 'production'),
 
     // Application debug mode
-    'debug' => env('APP_DEV_MODE', false),
+    'debug' => env('APP_DEBUG_MODE', false),
 
     // Base URL
     'base_url' => env('APP_BASE_URL', 'https://api.tranquillity.com'),
@@ -23,7 +23,7 @@ return [
     'locale_fallback' => 'en',
 
     // Dependency injection compliation path
-    'di_compilation_path' => env('APP_DI_COMPLILE_PATH', './var/cache/container'),
+    'di_compilation_path' => env('APP_DI_COMPILE_PATH', './var/cache/container'),
 
     // JSON:API details
     'jsonapi' => [

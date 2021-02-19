@@ -22,7 +22,7 @@ class Application
 
         // Build dependency injection container
         $containerBuilder = new ContainerBuilder();
-        if ($config->has('app.di_compliation_path')) {
+        if ($config->get('app.env', 'production') == 'production') {
             $containerBuilder->enableCompilation($config->get('app.di_compilation_path'));
         }
         $containerBuilder->addDefinitions(['config' => $config]);

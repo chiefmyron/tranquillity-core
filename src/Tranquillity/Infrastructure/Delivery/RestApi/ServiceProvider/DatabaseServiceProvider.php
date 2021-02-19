@@ -14,6 +14,7 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
@@ -35,6 +36,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider
                 $config = $c->get('config');
                 $options = $config->get('database.options', []);
                 $connection = $config->get('database.connection', []);
+                $debugMode = $config->get('app.debug', false);
 
                 // Create Doctrine configuration
                 $config = Setup::createConfiguration(
@@ -59,6 +61,10 @@ class DatabaseServiceProvider extends AbstractServiceProvider
 
                     // Create entity manager
                     $entityManager = EntityManager::create($connection, $config, $eventManager);
+                    if ($debugMode == true) {
+                        $logger = new DebugStack();
+                        $entityManager->getConnection()->getConfiguration()->setSQLLogger($logger);
+                    }
 
                     // Register UUID data type
                     Type::addType(UuidBinaryOrderedTimeType::NAME, UuidBinaryOrderedTimeType::class);

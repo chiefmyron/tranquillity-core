@@ -11,6 +11,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Tranquillity\Infrastructure\Profiling\Caster\ObjectParameter;
 
 class DatabaseDataCollector extends AbstractDataCollector implements DataCollectorInterface
@@ -47,10 +48,8 @@ class DatabaseDataCollector extends AbstractDataCollector implements DataCollect
      */
     public function collect(ServerRequestInterface $request, ResponseInterface $response, ?Throwable $exception = null)
     {
-        $this->data = [
-            'queries' => $this->sanitiseQueries($this->logger->queries),
-            'connection' => $this->connection->getConfiguration()
-        ];
+        // Get query details
+        $this->data['queries'] = $this->sanitiseQueries($this->logger->queries);
     }
 
     /**
@@ -151,5 +150,12 @@ class DatabaseDataCollector extends AbstractDataCollector implements DataCollect
         }
 
         return [$var, true, true];
+    }
+
+    public function __sleep()
+    {
+        //
+        
+        return ['data'];
     }
 }

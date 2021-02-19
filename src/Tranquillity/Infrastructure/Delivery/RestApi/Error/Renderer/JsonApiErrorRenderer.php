@@ -163,15 +163,17 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
 
     private function formatExceptionDetails(Throwable $exception): array
     {
-        $exceptionDetail = [];
+        $exceptionDetails = [];
         do {
-            $exceptionDetail[] = [
+            $exceptionDetail = [
                 'type' => get_class($exception),
                 'code' => $exception->getCode(),
                 'message' => $exception->getMessage(),
                 'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTrace()
             ];
+            $exceptionDetails[] = $exceptionDetail;
         } while ($exception = $exception->getPrevious());
         return $exceptionDetail;
     }

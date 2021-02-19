@@ -2,13 +2,12 @@
 
 return [
     'options' => [
-        'auto_generate_proxies' => env('APP_DEV_MODE', false),
+        'auto_generate_proxies' => env('APP_DEBUG_MODE', false),
         'proxy_dir' => env('DOCTRINE_PROXY_DIR', './var/cache/proxies'),
         'entity_dir' => [
             env('DOCTRINE_ENTITY_DIR', './src/Data/Entities')
         ],
         'mappings_dir' => [
-            //env('DOCTRINE_ENTITY_MAPPING_DIR', './src/Tranquillity/Infrastructure/Persistence/Doctrine/Mapping') => 'Tranquillity\Domain\Model'
             env('DOCTRINE_ENTITY_MAPPING_DIR', './src/Tranquillity/Infrastructure/Persistence/Doctrine/Mapping')
         ],
         'cache' => null,
