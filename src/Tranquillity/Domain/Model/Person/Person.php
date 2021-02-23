@@ -6,6 +6,8 @@ namespace Tranquillity\Domain\Model\Person;
 
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
+use Tranquillity\Domain\Event\DomainEventPublisher;
+use Tranquillity\Domain\Event\Person\PersonCreated;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\DomainEntity;
 use Tranquillity\Domain\Validation\Notification;
@@ -49,6 +51,11 @@ class Person extends DomainEntity
                 422
             );
         }
+
+        // Publish person creation
+        DomainEventPublisher::instance()->publish(
+            new PersonCreated($this->id)
+        );
     }
 
     // ****************************************************

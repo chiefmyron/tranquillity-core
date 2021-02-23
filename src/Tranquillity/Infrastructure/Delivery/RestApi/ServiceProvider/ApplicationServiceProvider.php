@@ -8,6 +8,9 @@ use DI\ContainerBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Domain\Event\DomainEventPublisher;
+use Tranquillity\Domain\Event\DomainEventStore;
+use Tranquillity\Domain\Event\StoredEvent;
 use Tranquillity\Domain\Model\Person\Person;
 use Tranquillity\Domain\Model\Person\PersonRepository;
 use Tranquillity\Infrastructure\Persistence\Doctrine\DoctrineTransactionalSession;
@@ -30,10 +33,20 @@ class ApplicationServiceProvider extends AbstractServiceProvider
                 return $em->getRepository(Person::class);
             },
 
+
             // Register persistence transaction handler
             TransactionalSession::class => function (ContainerInterface $c): TransactionalSession {
                 $em = $c->get(EntityManagerInterface::class);
                 return new DoctrineTransactionalSession($em);
+            },
+
+            // Register domain event subscribers
+            DomainEventStore::class => function (ContainerInterface $c): DomainEventStore {
+                $em = $c->get(EntityManagerInterface::class);
+                return $em->getRepository(StoredEvent::class);
+            },
+            DomainEventPublisher::class => function (ContainerInterface $c): DomainEventPublisher {
+                return DomainEventPublisher::instance();
             }
         ]);
     }

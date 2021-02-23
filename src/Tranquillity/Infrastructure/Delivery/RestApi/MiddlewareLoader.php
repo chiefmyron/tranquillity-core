@@ -10,6 +10,7 @@ use Slim\Error\Renderers\PlainTextErrorRenderer;
 use Slim\Middleware\ContentLengthMiddleware;
 use Tranquillity\Infrastructure\Delivery\RestApi\Error\RestApiErrorHandler;
 use Tranquillity\Infrastructure\Delivery\RestApi\Error\Renderer\JsonApiErrorRenderer;
+use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\EventSubscriberMiddleware;
 use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\ProfilerMiddleware;
 
 class MiddlewareLoader
@@ -32,6 +33,7 @@ class MiddlewareLoader
 
         // Register middlewares
         $app->add(ProfilerMiddleware::class);
+        $app->add(EventSubscriberMiddleware::class);
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
         $app->add(ContentLengthMiddleware::class);
