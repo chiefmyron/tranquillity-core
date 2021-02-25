@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\Person;
 
-use Tranquillity\Application\DataTransformer\JsonApi\PersonResourceCollectionDataTransformer;
+use Tranquillity\Application\DataTransformer\PersonCollectionDataTransformer;
 use Tranquillity\Domain\Model\Person\PersonRepository;
 
 class ListPeopleService
@@ -16,7 +16,7 @@ class ListPeopleService
         $this->repository = $repository;
     }
 
-    public function execute(ListPeopleRequest $request, PersonResourceCollectionDataTransformer $dataTransformer): array
+    public function execute(ListPeopleRequest $request, PersonCollectionDataTransformer $dataTransformer): array
     {
         // Get request details
         $filters = $request->filters();

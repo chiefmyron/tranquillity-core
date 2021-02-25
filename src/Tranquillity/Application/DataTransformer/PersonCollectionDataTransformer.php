@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\DataTransformer;
 
-use Tranquillity\Domain\Model\Person\Person;
+use Tranquillity\Domain\Model\Person\PersonCollection;
 
 interface PersonCollectionDataTransformer
 {
     /**
-     * @param array<Person> $personCollection
+     * @param PersonCollection $personCollection
      * @return void
      */
-    public function write(array $personCollection);
+    public function write(PersonCollection $personCollection);
 
     /**
      * @return mixed

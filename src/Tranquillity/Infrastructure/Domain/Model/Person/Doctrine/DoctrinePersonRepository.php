@@ -9,6 +9,8 @@ use Tranquillity\Domain\Model\Person\Person;
 use Tranquillity\Domain\Model\Person\PersonId;
 use Tranquillity\Domain\Model\Person\PersonRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Tranquillity\Domain\Model\Person\PersonCollection;
 
 class DoctrinePersonRepository extends EntityRepository implements PersonRepository
 {
@@ -32,7 +34,7 @@ class DoctrinePersonRepository extends EntityRepository implements PersonReposit
         $this->getEntityManager()->persist($person);
     }
 
-    public function list(array $filterConditions, array $sortConditions, int $pageNumber, int $pageSize): array
+    public function list(array $filterConditions, array $sortConditions, int $pageNumber, int $pageSize): PersonCollection
     {
         // Build query to retrieve list of people
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
@@ -49,10 +51,16 @@ class DoctrinePersonRepository extends EntityRepository implements PersonReposit
             $offset = $pageSize * ($pageNumber - 1);
             $query->setFirstResult($offset);
             $query->setMaxResults($pageSize);
+            $paginator = new Paginator($query, true);
+
+            // Generate paginated result collection
+            return new PersonCollection($paginator, $paginator->count(), $pageNumber, $pageSize);
         }
 
         // Execute query and return result set
-        return $query->getResult();
+        $result = $query->getResult();
+        $totalRecordCount = count($result);
+        return new PersonCollection($result, $totalRecordCount, $pageNumber, $pageSize);
     }
 
     public function findById(PersonId $id): ?Person

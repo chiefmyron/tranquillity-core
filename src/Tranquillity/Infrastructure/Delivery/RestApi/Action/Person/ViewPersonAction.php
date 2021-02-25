@@ -6,10 +6,10 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\Person;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\DataTransformer\JsonApi\PersonResourceObjectDataTransformer;
 use Tranquillity\Application\Service\Person\ViewPersonRequest;
 use Tranquillity\Application\Service\Person\ViewPersonService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApiPersonDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 
@@ -29,7 +29,7 @@ class ViewPersonAction extends AbstractListAction
         $relatedResources = $request->getAttribute('include') ?? [];
 
         $viewPersonRequest = new ViewPersonRequest($id, $fields, $relatedResources);
-        $person = $this->service->execute($viewPersonRequest, new PersonResourceObjectDataTransformer($request));
+        $person = $this->service->execute($viewPersonRequest, new JsonApiPersonDataTransformer($request));
         return JsonApiResponder::writeResponse($response, $person, HttpStatusCodeEnum::OK);
     }
 }

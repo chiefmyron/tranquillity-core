@@ -12,7 +12,7 @@ abstract class DomainEntity
 
     public function changeAttribute(string $attributeName, $value): self
     {
-        // Standard 'change' function should following the naming convention 'change<AttributeName>
+        // Standard 'change' function should following the naming convention 'change<AttributeName>'
         $functionName = 'change' . ucfirst($attributeName);
         if (method_exists($this, $functionName) == false) {
             throw new \UnexpectedValueException();

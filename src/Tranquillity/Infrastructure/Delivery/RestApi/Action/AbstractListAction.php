@@ -84,14 +84,14 @@ abstract class AbstractListAction
      * @param ServerRequestInterface $request
      * @return int
      */
-    protected function getPageNumber(ServerRequestInterface $request)
+    protected function getPageNumber(ServerRequestInterface $request): int
     {
         // Get array of query string parameters from request
         $queryStringParams = $request->getQueryParams();
         $pageParam = $queryStringParams['page'] ?? array();
 
         $pageNumber = $pageParam['number'] ?? 0;
-        return $pageNumber;
+        return (int)$pageNumber;
     }
 
     /**
@@ -100,13 +100,13 @@ abstract class AbstractListAction
      * @param ServerRequestInterface $request
      * @return int
      */
-    protected function getPageSize(ServerRequestInterface $request)
+    protected function getPageSize(ServerRequestInterface $request): int
     {
         // Get array of query string parameters from request
         $queryStringParams = $request->getQueryParams();
         $pageParam = $queryStringParams['page'] ?? array();
 
         $pageSize = $pageParam['size'] ?? 0;
-        return $pageSize;
+        return (int)$pageSize;
     }
 }

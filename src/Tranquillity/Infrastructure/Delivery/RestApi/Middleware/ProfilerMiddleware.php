@@ -39,6 +39,18 @@ final class ProfilerMiddleware implements MiddlewareInterface
         $profile = $this->profiler->collect($request, $response);
         if ($profile !== null) {
             $this->profiler->saveProfile($profile);
+
+            // Add profile token to the response as metadata
+            $bodyJson = (string)$response->getBody();
+            $body = json_decode($bodyJson, true);
+            if (isset($body['meta']) == false) {
+                $body['meta'] = [];
+            }
+            $body['meta']['TQL_PROFILE_TOKEN'] = $profile->getToken();
+
+            // Write back new response body
+            $response->getBody()->rewind();
+            $response->getBody()->write(json_encode($body));
         }
 
         return $response;

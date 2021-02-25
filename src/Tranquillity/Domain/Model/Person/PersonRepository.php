@@ -16,5 +16,5 @@ interface PersonRepository
 
     public function findById(PersonId $id): ?Person;
 
-    public function list(array $filterConditions, array $sortConditions, int $pageNumber, int $pageSize): array;
+    public function list(array $filterConditions, array $sortConditions, int $pageNumber, int $pageSize): PersonCollection;
 }

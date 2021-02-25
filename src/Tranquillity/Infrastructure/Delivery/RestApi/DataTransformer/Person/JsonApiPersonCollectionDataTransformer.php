@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Application\DataTransformer\JsonApi;
+namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Slim\Routing\RouteContext;
 use Tranquillity\Application\DataTransformer\PersonCollectionDataTransformer;
-use Tranquillity\Domain\Model\Person\Person;
 use Tranquillity\Domain\Model\Person\PersonCollection;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\ResourceCollectionDataTransformer;
 
-class PersonResourceCollectionDataTransformer extends AbstractResourceCollectionDataTransformer implements PersonCollectionDataTransformer
+class JsonApiPersonCollectionDataTransformer extends ResourceCollectionDataTransformer implements PersonCollectionDataTransformer
 {
     /**
      * @param PersonCollection $personCollection
@@ -21,17 +19,27 @@ class PersonResourceCollectionDataTransformer extends AbstractResourceCollection
     public function write(PersonCollection $personCollection, array $fields = [], array $relatedResources = [])
     {
         // Create a data transformer for the entity
-        $dataTransformer = new PersonResourceObjectDataTransformer($this->request);
+        $dataTransformer = new JsonApiPersonDataTransformer($this->request);
 
         // Generate resource objects for each element of the collection
         $collection = $personCollection->collection();
         foreach ($collection as $person) {
+            // Generate main resource object data
             $dataTransformer->write($person, $fields, $relatedResources);
             $personResource = $dataTransformer->read();
+
+            // Generate 'self' link for the resource
+            $uri = $this->request->getUri();
+            $link = $this->routeParser->fullUrlFor($uri, 'person-detail', ['id' => $personResource['data']['id']]);
+            $personResource['data']['link'] = ['self' => $link];
+
+            // Add resource object to array
             $this->data[] = $personResource['data'];
         }
 
         $this->links = $this->writeLinks($personCollection);
+
+        $this->meta['totalRecords'] = $personCollection->totalRecordCount();
     }
 
     private function writeLinks(PersonCollection $personCollection): array
@@ -49,31 +57,23 @@ class PersonResourceCollectionDataTransformer extends AbstractResourceCollection
             return $links;
         }
 
-        // Get route parser
-        $uri = $this->request->getUri();
-        $routeParser = RouteContext::fromRequest($this->request)->getRouteParser();
-
         // Calculate pagination limits
         $lastPageNumber = ceil($totalRecordCount / $pageSize);
 
-        // Get route details
-        $route = $this->request->getAttribute('route');
-        $routeName = $route->getName();
-        $routeArgs = $route->getArguments();
-
         // Generate pagination links
-        $links['self'] = "" . $this->request->getUri();
-        $links['first'] = $routeParser->fullUrlFor($uri, $routeName, $routeArgs, ['page[number]' => 1, 'page[size]' => $pageSize]);
-        $links['last'] = $routeParser->fullUrlFor($uri, $routeName, $routeArgs, ['page[number]' => $lastPageNumber, 'page[size]' => $pageSize]);
+        $uri = $this->request->getUri();
+        $links['self'] = "" . $uri;
+        $links['first'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => 1, 'page[size]' => $pageSize]);
+        $links['last'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => $lastPageNumber, 'page[size]' => $pageSize]);
 
         if ($pageNumber > 1) {
-            $links['prev'] = $routeParser->fullUrlFor($uri, $routeName, $routeArgs, ['page[number]' => ($pageNumber - 1), 'page[size]' => $pageSize]);
+            $links['prev'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => ($pageNumber - 1), 'page[size]' => $pageSize]);
         } else {
             $links['prev'] = null;
         }
 
         if ($pageNumber < $lastPageNumber) {
-            $links['next'] = $routeParser->fullUrlFor($uri, $routeName, $routeArgs, ['page[number]' => ($pageNumber + 1), 'page[size]' => $pageSize]);
+            $links['next'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => ($pageNumber + 1), 'page[size]' => $pageSize]);
         } else {
             $links['next'] = null;
         }
