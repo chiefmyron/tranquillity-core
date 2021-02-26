@@ -24,9 +24,12 @@ class ListPeopleAction extends AbstractListAction
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
+        // Build service request
         $listPeopleRequest = new ListPeopleRequest(
             $this->getFilterParameters($request),
             $this->getSortParameters($request),
+            $this->getSparseFieldset($request),
+            $this->getIncludedResources($request),
             $this->getPageNumber($request),
             $this->getPageSize($request)
         );

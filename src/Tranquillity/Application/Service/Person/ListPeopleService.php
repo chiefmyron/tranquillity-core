@@ -21,12 +21,14 @@ class ListPeopleService
         // Get request details
         $filters = $request->filters();
         $sorting = $request->sorting();
+        $fields = $request->fields();
+        $relatedResources = $request->relatedResources();
         $pageNumber = $request->pageNumber();
         $pageSize = $request->pageSize();
 
         // Get paginated list of people
         $peopleList = $this->repository->list($filters, $sorting, $pageNumber, $pageSize);
-        $dataTransformer->write($peopleList);
+        $dataTransformer->write($peopleList, $fields, $relatedResources);
 
         // Assemble the DTO for the response
         return $dataTransformer->read();

@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Infrastructure\Enum\FilterOperatorEnum;
 use Tranquillity\Infrastructure\Enum\SortDirectionEnum;
 
-abstract class AbstractListAction
+abstract class AbstractListAction extends AbstractAction
 {
 
     /**
@@ -19,7 +19,7 @@ abstract class AbstractListAction
      * @param ServerRequestInterface $request
      * @return array
      */
-    protected function getFilterParameters(ServerRequestInterface $request)
+    protected function getFilterParameters(ServerRequestInterface $request): array
     {
         // Get array of query string parameters from request
         $queryStringParams = $request->getQueryParams();
@@ -54,9 +54,9 @@ abstract class AbstractListAction
      *
      * @see https://jsonapi.org/format/#fetching-sorting
      * @param ServerRequestInterface $request
-     * @return mixed
+     * @return array
      */
-    protected function getSortParameters(ServerRequestInterface $request)
+    protected function getSortParameters(ServerRequestInterface $request): array
     {
         // Get array of query string parameters from request
         $queryStringParams = $request->getQueryParams();

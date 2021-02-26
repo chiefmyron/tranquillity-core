@@ -60,20 +60,37 @@ class JsonApiPersonCollectionDataTransformer extends ResourceCollectionDataTrans
         // Calculate pagination limits
         $lastPageNumber = ceil($totalRecordCount / $pageSize);
 
-        // Generate pagination links
+        // Get sparse fieldset and included resources from request
+        $queryStringParams = $this->request->getQueryParams();
+
+        // 'Self' link
         $uri = $this->request->getUri();
         $links['self'] = "" . $uri;
-        $links['first'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => 1, 'page[size]' => $pageSize]);
-        $links['last'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => $lastPageNumber, 'page[size]' => $pageSize]);
 
+        // 'First' link
+        $queryStringParams['page[number]'] = 1;
+        $queryStringParams['page[size]'] = $pageSize;
+        $links['first'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), $queryStringParams);
+
+        // 'Last' link
+        $queryStringParams['page[number]'] = $lastPageNumber;
+        $queryStringParams['page[size]'] = $pageSize;
+        $links['last'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), $queryStringParams);
+
+        // 'Previous' link
         if ($pageNumber > 1) {
-            $links['prev'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => ($pageNumber - 1), 'page[size]' => $pageSize]);
+            $queryStringParams['page[number]'] = ($pageNumber - 1);
+            $queryStringParams['page[size]'] = $pageSize;
+            $links['prev'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), $queryStringParams);
         } else {
             $links['prev'] = null;
         }
 
+        // 'Next' link
         if ($pageNumber < $lastPageNumber) {
-            $links['next'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), ['page[number]' => ($pageNumber + 1), 'page[size]' => $pageSize]);
+            $queryStringParams['page[number]'] = ($pageNumber + 1);
+            $queryStringParams['page[size]'] = $pageSize;
+            $links['next'] = $this->routeParser->fullUrlFor($uri, $this->getRouteName(), $this->getRouteArguments(), $queryStringParams);
         } else {
             $links['next'] = null;
         }

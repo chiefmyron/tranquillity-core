@@ -8,12 +8,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Application\Service\Person\ViewPersonRequest;
 use Tranquillity\Application\Service\Person\ViewPersonService;
-use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
+use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApiPersonDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 
-class ViewPersonAction extends AbstractListAction
+class ViewPersonAction extends AbstractAction
 {
     private ViewPersonService $service;
 
@@ -24,11 +24,13 @@ class ViewPersonAction extends AbstractListAction
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $id = $request->getAttribute('id');
-        $fields = $request->getAttribute('fields') ?? [];
-        $relatedResources = $request->getAttribute('include') ?? [];
+        // Build service request
+        $viewPersonRequest = new ViewPersonRequest(
+            $request->getAttribute('id'),
+            $this->getSparseFieldset($request),
+            $this->getIncludedResources($request)
+        );
 
-        $viewPersonRequest = new ViewPersonRequest($id, $fields, $relatedResources);
         $person = $this->service->execute($viewPersonRequest, new JsonApiPersonDataTransformer($request));
         return JsonApiResponder::writeResponse($response, $person, HttpStatusCodeEnum::OK);
     }

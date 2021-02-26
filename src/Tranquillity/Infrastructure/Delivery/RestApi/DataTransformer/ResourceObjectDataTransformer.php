@@ -77,4 +77,21 @@ abstract class ResourceObjectDataTransformer
     abstract protected function writeLinks($entity): array;
 
     abstract protected function writeIncluded($entity, array $relatedResources = [], array $included = []): array;
+
+    protected function applySparseFieldset(array $attributes, array $fields): array
+    {
+        if (count($fields) <= 0) {
+            // No sparse fieldset requested - return full resource
+            return $attributes;
+        }
+
+        // If a sparse fieldset has been defined for this entity type, apply it now
+        $sparseAttribs = [];
+        foreach ($fields as $field) {
+            if (isset($attributes[$field]) == true) {
+                $sparseAttribs[$field] = $attributes[$field];
+            }
+        }
+        return $sparseAttribs;
+    }
 }

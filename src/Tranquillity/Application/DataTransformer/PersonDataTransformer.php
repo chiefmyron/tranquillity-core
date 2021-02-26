@@ -9,10 +9,10 @@ use Tranquillity\Domain\Model\Person\Person;
 interface PersonDataTransformer
 {
     /**
-     * @param Person $person
+     * @param Person $entity
      * @return void
      */
-    public function write(Person $person);
+    public function write(Person $entity);
 
     /**
      * @return mixed
