@@ -7,7 +7,7 @@ namespace Tranquillity\Domain\Validation;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Exception\DomainException;
 
-class NotificationError
+class Error
 {
     protected int $status; // HTTP status code applicable to this notification
     protected string $code; // Application-specific error code
@@ -54,27 +54,6 @@ class NotificationError
             $sourceType,
             $sourceValue,
             $meta
-        );
-    }
-
-    public static function createFromDomainException(DomainException $exception): self
-    {
-        // Extract error source from exception
-        $sourceType = '';
-        $sourceValue = '';
-        $source = $exception->getSource();
-        if (is_null($source) == false) {
-            $sourceType = array_key_first($source) ?? '';
-            $sourceValue = $source[$sourceType] ?? '';
-        }
-
-        return new static(
-            $exception->getStatusCode(),
-            $exception->getErrorCode(),
-            $exception->getTitle(),
-            $exception->getDetail(),
-            $sourceType,
-            $sourceValue
         );
     }
 

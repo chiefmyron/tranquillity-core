@@ -18,7 +18,8 @@ class DoctrinePersonId extends UuidBinaryOrderedTimeType
     }
 
     /**
-     * Undocumented function
+     * Converts a value from its database representation to its PHP representation
+     * of this type.
      *
      * @param mixed $value
      * @param AbstractPlatform $platform
@@ -34,7 +35,7 @@ class DoctrinePersonId extends UuidBinaryOrderedTimeType
     }
 
     /**
-     * Undocumented function
+     * Modifies the SQL expression (identifier, parameter) to convert to a database value.
      *
      * @param mixed $value
      * @param AbstractPlatform $platform

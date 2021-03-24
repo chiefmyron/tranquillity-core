@@ -19,6 +19,8 @@ use Tranquillity\Data\Entities\OAuth\ClientEntity;
 use Tranquillity\Data\Entities\OAuth\RefreshTokenEntity;
 use Tranquillity\Data\Entities\Business\UserEntity;
 use Tranquillity\Data\Entities\OAuth\ScopeEntity;
+use Tranquillity\Domain\Service\User\HashingService;
+use Tranquillity\Infrastructure\Domain\Service\User\NativePhpHashingService;
 
 class AuthenticationServiceProvider extends AbstractServiceProvider
 {
@@ -30,6 +32,16 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
     public function register(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addDefinitions([
+            // Register password hashing and verification service
+            HashingService::class => function (ContainerInterface $c) {
+                // Get connection and options from config
+                $config = $c->get('config');
+                $algorithm = $config->get('auth.password_algorithm', PASSWORD_DEFAULT);
+                $options = $config->get('auth.password_options', []);
+
+                return new NativePhpHashingService($algorithm, $options);
+            }
+
             // Register OAuth2 server with the container
             /*OAuth2Server::class => function (ContainerInterface $c) {
                 // Get entities used to represent OAuth objects

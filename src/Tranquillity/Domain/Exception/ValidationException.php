@@ -4,20 +4,34 @@ declare(strict_types=1);
 
 namespace Tranquillity\Domain\Exception;
 
-use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Domain\Validation\Error;
 
-final class ValidationException extends \RuntimeException
+final class ValidationException extends \DomainException
 {
-    private Notification $notification;
+    /** @var array<Error> */
+    private array $errors;
 
-    public function __construct(string $message, Notification $notification, int $code, \Throwable $previous = null)
+    /**
+     * Constructor
+     *
+     * @param string $message
+     * @param array<Error> $errors
+     * @param integer $code
+     * @param \Throwable $previous
+     */
+    public function __construct(string $message, array $errors, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->notification = $notification;
+        $this->errors = $errors;
     }
 
-    public function getNotification(): Notification
+    public function getErrors(): array
     {
-        return $this->notification;
+        return $this->errors;
+    }
+
+    public function hasErrors(): bool
+    {
+        return (count($this->errors) > 0);
     }
 }

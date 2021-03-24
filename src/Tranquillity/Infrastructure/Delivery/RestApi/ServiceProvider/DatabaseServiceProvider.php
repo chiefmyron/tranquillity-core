@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
 use Tranquillity\Infrastructure\Domain\Model\Person\Doctrine\DoctrinePersonId;
+use Tranquillity\Infrastructure\Domain\Model\User\Doctrine\DoctrineUserId;
 use Tranquillity\Infrastructure\Persistence\Doctrine\TablePrefixExtension;
 
 class DatabaseServiceProvider extends AbstractServiceProvider
@@ -58,6 +59,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider
                 try {
                     // Register entity ID types
                     Type::addType('PersonId', DoctrinePersonId::class);
+                    Type::addType('UserId', DoctrineUserId::class);
 
                     // Create entity manager
                     $entityManager = EntityManager::create($connection, $config, $eventManager);

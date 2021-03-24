@@ -16,10 +16,13 @@ class Notification
     private array $notifications = [];
 
     /**
-     * Use message and triggering exception to add a new NotificationError to the Notification
+     * Add error directly to the notification
      *
-     * @param string $message
-     * @param \Exception|null $exception
+     * @param string $code
+     * @param string $detail
+     * @param string $sourceType
+     * @param string $sourceValue
+     * @param array $meta
      * @return void
      */
     public function addItem(
@@ -29,31 +32,32 @@ class Notification
         string $sourceValue = '',
         array $meta = []
     ): void {
-        $item = NotificationError::create($code, $detail, $sourceType, $sourceValue, $meta);
-        $this->addNotificationError($item);
+        $error = Error::create($code, $detail, $sourceType, $sourceValue, $meta);
+        $this->addError($error);
     }
 
     /**
-     * Use detail from a DomainException to add a new NotificationError to the Notification
+     * Add new Error to the Notification
      *
-     * @param DomainException $exception
+     * @param Error $error
      * @return void
      */
-    public function addDomainException(DomainException $exception): void
+    public function addError(Error $error): void
     {
-        $item = NotificationError::createFromDomainException($exception);
-        $this->addNotificationError($item);
+        $this->notifications[] = $error;
     }
 
     /**
-     * Add new NotificationError to the Notification
+     * Add multiple Errors to the Notification
      *
-     * @param NotificationError $item
+     * @param array<Error> $errors
      * @return void
      */
-    public function addNotificationError(NotificationError $item)
+    public function addErrors(array $errors): void
     {
-        $this->notifications[] = $item;
+        foreach ($errors as $error) {
+            $this->addError($error);
+        }
     }
 
     /**
@@ -61,7 +65,7 @@ class Notification
      *
      * @return boolean
      */
-    public function hasItems(): bool
+    public function hasErrors(): bool
     {
         if (count($this->notifications) > 0) {
             return true;
@@ -71,11 +75,11 @@ class Notification
     }
 
     /**
-     * Return the set of NotificationErrors
+     * Return the set of Errors
      *
-     * @return array<NotificationError>
+     * @return array<Error>
      */
-    public function getItems(): array
+    public function getErrors(): array
     {
         return $this->notifications;
     }

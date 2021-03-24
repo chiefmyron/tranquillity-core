@@ -48,7 +48,7 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
             $errors = $this->formatGenericException($exception, $displayErrorDetails);
         }
 
-        return (string) json_encode(['errors' => $errors], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return (string) json_encode(['errors' => $errors], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
     private function formatValidationException(ValidationException $exception, bool $displayErrorDetails): array
@@ -125,7 +125,7 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
         $error = [
             'status' => $exception->getCode(), // The HTTP status code applicable to this problem
             'title'  => $exception->getTitle(),
-            'detail' => $exception->getDescription(),
+            'detail' => $exception->getMessage(),
         ];
 
         // If we are displaying error details, include them in the error metadata

@@ -7,4 +7,5 @@ namespace Tranquillity\Domain\Enum;
 final class EntityTypeEnum
 {
     public const PERSON = 'person';
+    public const USER = 'user';
 }

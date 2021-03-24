@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\Person;
 
-use Tranquillity\Application\DataTransformer\PersonCollectionDataTransformer;
+use Tranquillity\Application\DataTransformer\Person\PersonCollectionDataTransformer;
 use Tranquillity\Domain\Model\Person\PersonRepository;
 
 class ListPeopleService
 {
     private PersonRepository $repository;
+    private PersonCollectionDataTransformer $dataTransformer;
 
-    public function __construct(PersonRepository $repository)
+    public function __construct(PersonRepository $repository, PersonCollectionDataTransformer $dataTransformer)
     {
         $this->repository = $repository;
+        $this->dataTransformer = $dataTransformer;
     }
 
-    public function execute(ListPeopleRequest $request, PersonCollectionDataTransformer $dataTransformer): array
+    /**
+     * @param ListPeopleRequest $request
+     * @return mixed
+     */
+    public function execute(ListPeopleRequest $request)
     {
         // Get request details
         $filters = $request->filters();
@@ -28,9 +34,9 @@ class ListPeopleService
 
         // Get paginated list of people
         $peopleList = $this->repository->list($filters, $sorting, $pageNumber, $pageSize);
-        $dataTransformer->write($peopleList, $fields, $relatedResources);
+        $this->dataTransformer->write($peopleList, $fields, $relatedResources);
 
         // Assemble the DTO for the response
-        return $dataTransformer->read();
+        return $this->dataTransformer->read();
     }
 }

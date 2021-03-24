@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Application\DataTransformer;
+namespace Tranquillity\Application\DataTransformer\Person;
 
 use Tranquillity\Domain\Model\Person\Person;
 

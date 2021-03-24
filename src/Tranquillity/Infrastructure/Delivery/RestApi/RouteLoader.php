@@ -7,6 +7,7 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\Person;
+use Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
 
 class RouteLoader
 {
@@ -43,9 +44,9 @@ class RouteLoader
             // $group->delete('/tags/{id}/relationships/{resource}', TagController::class.':deleteRelationship');
 
             // // User resource
-            // $group->get('/users', UserController::class.':list')->setName('user-list')->setArgument('auth-scope', 'users:read');
-            // $group->post('/users', UserController::class.':create')->setArgument('auth-scope', 'users:write');
-            // $group->get('/users/{id}', UserController::class.':show')->setName('user-detail')->setArgument('auth-scope', 'users:write');
+            $group->get('/users', User\ListUsersAction::class)->setName('user-list')->setArgument('auth-scope', 'users:read');
+            $group->post('/users', User\CreateUserAction::class)->setArgument('auth-scope', 'users:write');
+            $group->get('/users/{id}', Person\ViewPersonAction::class)->setName('user-detail')->setArgument('auth-scope', 'users:read');
             // $group->patch('/users/{id}', UserController::class.':update')->setArgument('auth-scope', 'users:write');
             // $group->delete('/users/{id}', UserController::class.':delete')->setArgument('auth-scope', 'users:write');
             // $group->get('/users/{id}/{resource}', UserController::class.':showRelated')->setName('user-related')->setArgument('auth-scope', 'users:write');;

@@ -4,28 +4,26 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\Person;
 
-use Tranquillity\Application\DataTransformer\PersonDataTransformer;
-use Tranquillity\Domain\Exception\Person\PersonDoesNotExistException;
+use Tranquillity\Application\DataTransformer\Person\PersonDataTransformer;
 use Tranquillity\Domain\Model\Person\PersonId;
 use Tranquillity\Domain\Model\Person\PersonRepository;
-use Tranquillity\Domain\Validation\Notification;
-use Tranquillity\Domain\Validation\ValidationException;
 
 class ViewPersonService
 {
     private PersonRepository $repository;
+    private PersonDataTransformer $dataTransformer;
 
-    public function __construct(PersonRepository $repository)
+    public function __construct(PersonRepository $repository, PersonDataTransformer $dataTransformer)
     {
         $this->repository = $repository;
+        $this->dataTransformer = $dataTransformer;
     }
 
     /**
      * @param ViewPersonRequest $request
-     * @param PersonDataTransformer $dataTransformer
      * @return mixed
      */
-    public function execute(ViewPersonRequest $request, PersonDataTransformer $dataTransformer)
+    public function execute(ViewPersonRequest $request)
     {
         // Get request details
         $id = $request->id();
@@ -38,11 +36,11 @@ class ViewPersonService
         // Retrieve existing Person entity
         $person = $this->repository->findById(PersonId::create($request->id()));
         if (is_null($person) == true) {
-            throw new PersonDoesNotExistException("No person exists with ID {$request->id()}", 'pointer', '/data/id');
+            throw new \InvalidArgumentException("No person exists with ID {$request->id()}");
         }
 
         // Assemble the DTO for the response
-        $dataTransformer->write($person, $fields, $relatedResources);
-        return $dataTransformer->read();
+        $this->dataTransformer->write($person, $fields, $relatedResources);
+        return $this->dataTransformer->read();
     }
 }

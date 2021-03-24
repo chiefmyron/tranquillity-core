@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tranquillity\Infrastructure\Delivery\RestApi\Responder;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tranquillity\Infrastructure\Output\JsonApi\Document\AbstractDocument;
 
 class JsonApiResponder
 {
@@ -17,7 +19,7 @@ class JsonApiResponder
      * @param array $headers
      * @return ResponseInterface
      */
-    public static function writeResponse(ResponseInterface $response, $body, int $statusCode, array $headers = []): ResponseInterface
+    public static function writeResponse(ServerRequestInterface $request, ResponseInterface $response, AbstractDocument $document, int $statusCode, array $headers = []): ResponseInterface
     {
         // Set standard 'Content-Type' header for JSON:api responses
         $response = $response->withHeader('Content-Type', 'application/vnd.api+json');
@@ -29,6 +31,7 @@ class JsonApiResponder
         $response = $response->withStatus($statusCode);
 
         // Write payload body
+        $body = $document->render($request);
         $response->getBody()->write(json_encode($body));
         return $response;
     }

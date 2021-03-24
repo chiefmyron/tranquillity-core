@@ -11,6 +11,7 @@ use Slim\Middleware\ContentLengthMiddleware;
 use Tranquillity\Infrastructure\Delivery\RestApi\Error\RestApiErrorHandler;
 use Tranquillity\Infrastructure\Delivery\RestApi\Error\Renderer\JsonApiErrorRenderer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\EventSubscriberMiddleware;
+use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\JsonApiRequestValidationMiddleware;
 use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\ProfilerMiddleware;
 
 class MiddlewareLoader
@@ -30,14 +31,16 @@ class MiddlewareLoader
             return;
         }
         $logger = $container->get(LoggerInterface::class);
+        $config = $container->get('config');
 
         // Register middlewares
         $app->add(ProfilerMiddleware::class);
         $app->add(EventSubscriberMiddleware::class);
+        $app->add(JsonApiRequestValidationMiddleware::class);
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
-        $app->add(ContentLengthMiddleware::class);
-        $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
+        //$app->add(ContentLengthMiddleware::class);
+        $errorMiddleware = $app->addErrorMiddleware($config->get('app.debug'), true, true, $logger);
 
         // Set up custom error handler
         $responseErrorRenderer = new JsonApiErrorRenderer();

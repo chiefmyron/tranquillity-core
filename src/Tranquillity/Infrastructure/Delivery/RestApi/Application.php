@@ -6,6 +6,7 @@ use DI\ContainerBuilder;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestResponse;
+use Slim\Interfaces\RouteCollectorInterface;
 
 class Application
 {
@@ -40,6 +41,7 @@ class Application
 
         // Register routes
         RouteLoader::load($app);
+        $container->set(RouteCollectorInterface::class, $app->getRouteCollector());
 
         // Return bootstrapped application
         return $app;

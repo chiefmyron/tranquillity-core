@@ -10,12 +10,12 @@ use Tranquillity\Application\Service\Person\CreatePersonRequest;
 use Tranquillity\Application\Service\Person\CreatePersonService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApiPersonDataTransformer;
+use Tranquillity\Domain\Enum\EntityTypeEnum;
+use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
-use Tranquillity\Infrastructure\Enum\ResourceTypeEnum;
 
-class CreatePersonAction
+class CreatePersonAction extends AbstractAction
 {
     private CreatePersonService $service;
     private TransactionalSession $txnSession;
@@ -33,16 +33,20 @@ class CreatePersonAction
         $data = $payload['data'] ?? array();
 
         // Validate resource type in request
-        if ($data['type'] != ResourceTypeEnum::PERSON) {
-            throw new \Exception("Resource type of '" . ResourceTypeEnum::PERSON . "' is required");
+        if ($data['type'] != EntityTypeEnum::PERSON) {
+            throw new \Exception("Resource type of '" . EntityTypeEnum::PERSON . "' is required");
         }
 
         // Build request to create new person from payload
-        $createPersonRequest = CreatePersonRequest::createFromArray($data['attributes']);
+        $createPersonRequest = CreatePersonRequest::createFromArray(
+            $this->getSparseFieldset($request),
+            $this->getIncludedResources($request),
+            $data['attributes']
+        );
 
         // Execute transaction to create new person
         $txnService = new TransactionalService($this->service, $this->txnSession);
-        $person = $txnService->execute($createPersonRequest, new JsonApiPersonDataTransformer($request));
-        return JsonApiResponder::writeResponse($response, $person, HttpStatusCodeEnum::CREATED);
+        $person = $txnService->execute($createPersonRequest);
+        return JsonApiResponder::writeResponse($request, $response, $person, HttpStatusCodeEnum::CREATED);
     }
 }

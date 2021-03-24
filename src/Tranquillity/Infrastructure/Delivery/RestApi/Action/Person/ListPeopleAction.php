@@ -9,7 +9,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Application\Service\Person\ListPeopleRequest;
 use Tranquillity\Application\Service\Person\ListPeopleService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApiPersonCollectionDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 
@@ -34,7 +33,7 @@ class ListPeopleAction extends AbstractListAction
             $this->getPageSize($request)
         );
 
-        $people = $this->service->execute($listPeopleRequest, new JsonApiPersonCollectionDataTransformer($request));
-        return JsonApiResponder::writeResponse($response, $people, HttpStatusCodeEnum::OK);
+        $people = $this->service->execute($listPeopleRequest);
+        return JsonApiResponder::writeResponse($request, $response, $people, HttpStatusCodeEnum::OK);
     }
 }

@@ -44,10 +44,10 @@ class Person extends DomainEntity
 
         // Ensure entity is valid after creation
         $errors = $this->validate();
-        if ($errors->hasItems() === true) {
+        if ($errors->hasErrors() === true) {
             throw new ValidationException(
                 "Validation errors occurred while creating instance of " . self::class,
-                $errors,
+                $errors->getErrors(),
                 422
             );
         }
@@ -68,19 +68,19 @@ class Person extends DomainEntity
         return $this;
     }
 
-    public function setLastName(string $lastName): self
+    private function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
         return $this;
     }
 
-    public function setJobTitle(string $jobTitle): self
+    private function setJobTitle(string $jobTitle): self
     {
         $this->jobTitle = $jobTitle;
         return $this;
     }
 
-    public function setEmailAddress(string $emailAddress): self
+    private function setEmailAddress(string $emailAddress): self
     {
         $this->emailAddress = $emailAddress;
         return $this;
@@ -156,22 +156,21 @@ class Person extends DomainEntity
      */
     public function validate(): Notification
     {
-        $errors = new Notification();
+        $notification = new Notification();
 
         // Check mandatory fields
         $mandatoryFields = ['firstName', 'lastName', 'emailAddress'];
         foreach ($mandatoryFields as $fieldName) {
             if (trim($this->$fieldName) == '') {
-                $errors->addItem(ErrorCodeEnum::FIELD_VALIDATION_MANDATORY_VALUE_MISSING, "Mandatory field '{$fieldName}' has not been provided", 'pointer', "/data/attributes/{$fieldName}");
+                $notification->addItem(ErrorCodeEnum::FIELD_VALIDATION_MANDATORY_VALUE_MISSING, "Mandatory field '{$fieldName}' has not been provided", 'person', $fieldName);
             }
         }
 
-
         // Validate email address
         if (filter_var($this->emailAddress, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) === false) {
-            $errors->addItem(ErrorCodeEnum::FIELD_VALIDATION_EMAIL_FORMAT, "Email address '{$this->emailAddress}' is not valid", 'pointer', '/data/attributes/emailAddress');
+            $notification->addItem(ErrorCodeEnum::FIELD_VALIDATION_EMAIL_FORMAT, "Email address '{$this->emailAddress}' is not valid", 'person', 'emailAddress');
         }
 
-        return $errors;
+        return $notification;
     }
 }

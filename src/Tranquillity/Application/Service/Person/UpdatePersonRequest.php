@@ -13,15 +13,22 @@ class UpdatePersonRequest
     private ?string $emailAddress;
 
     private array $updatedAttributes = [];
+    private array $fields = [];
+    private array $relatedResources = [];
 
     public function __construct(
         string $id,
+        array $fields,
+        array $relatedResources,
         ?string $firstName,
         ?string $lastName,
         ?string $jobTitle,
         ?string $emailAddress
     ) {
         $this->id = $id;
+        $this->fields = $fields;
+        $this->relatedResources = $relatedResources;
+
         $this->firstName = $firstName;
         if (is_null($firstName) == false) {
             $this->updatedAttributes[] = 'firstName';
@@ -40,10 +47,12 @@ class UpdatePersonRequest
         }
     }
 
-    public static function createFromArray(string $id, array $attributes): self
+    public static function createFromArray(string $id, array $fields, array $relatedResources, array $attributes): self
     {
         return new self(
             $id,
+            $fields,
+            $relatedResources,
             $attributes['firstName'] ?? null,
             $attributes['lastName'] ?? null,
             $attributes['jobTitle'] ?? null,
@@ -54,6 +63,16 @@ class UpdatePersonRequest
     public function id(): string
     {
         return $this->id;
+    }
+
+    public function fields(): array
+    {
+        return $this->fields;
+    }
+
+    public function relatedResources(): array
+    {
+        return $this->relatedResources;
     }
 
     public function firstName(): ?string

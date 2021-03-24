@@ -10,5 +10,5 @@ interface ApplicationService
      * @param $request
      * @return mixed
      */
-    public function execute($request = null, $dataTransformer = null);
+    public function execute($request = null);
 }
