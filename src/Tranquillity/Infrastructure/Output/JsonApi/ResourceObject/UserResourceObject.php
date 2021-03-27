@@ -22,7 +22,7 @@ class UserResourceObject extends AbstractResourceObject
             'timezoneCode' => $entity->timezoneCode(),
             'localeCode' => $entity->localeCode(),
             'active' => $entity->active(),
-            'registeredDateTime' => $entity->registeredDateTime()
+            'registeredDateTime' => $this->writeDateTime($entity->registeredDateTime())
         ];
 
         // Check if a sparse fieldset has been requested for this resource
@@ -40,7 +40,7 @@ class UserResourceObject extends AbstractResourceObject
         $links = [];
 
         // Generate 'self' link
-        $links['self'] = $this->urlForRoute('user-detail', ['id' => $entity->getIdValue()]);
+        $links['self'] = $this->writeUrlForRoute('user-detail', ['id' => $entity->getIdValue()]);
         return $links;
     }
 }

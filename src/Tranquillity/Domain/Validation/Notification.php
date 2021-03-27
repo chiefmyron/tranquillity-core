@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tranquillity\Domain\Validation;
 
-use Tranquillity\Domain\Exception\DomainException;
-
 /**
  * Implementation of Notification pattern for handling domain validation.
  *

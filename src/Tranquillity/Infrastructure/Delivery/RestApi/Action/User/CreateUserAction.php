@@ -11,8 +11,7 @@ use Tranquillity\Application\Service\User\CreateUserService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class CreateUserAction
 {
@@ -39,9 +38,11 @@ class CreateUserAction
         // Build request to create new User from payload
         $createUserRequest = CreateUserRequest::createFromArray($data['attributes']);
 
-        // Execute transaction to create new User
+        // Execute as a transaction
         $txnService = new TransactionalService($this->service, $this->txnSession);
+
+        /** @var RestResponse */
         $user = $txnService->execute($createUserRequest);
-        return JsonApiResponder::writeResponse($request, $response, $user, HttpStatusCodeEnum::CREATED);
+        return $user->writeResponse($request, $response);
     }
 }

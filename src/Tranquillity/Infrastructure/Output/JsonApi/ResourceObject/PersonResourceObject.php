@@ -39,7 +39,7 @@ class PersonResourceObject extends AbstractResourceObject
         $links = [];
 
         // Generate 'self' link
-        $links['self'] = $this->urlForRoute('person-detail', ['id' => $entity->getIdValue()]);
+        $links['self'] = $this->writeUrlForRoute('person-detail', ['id' => $entity->getIdValue()]);
         return $links;
     }
 }

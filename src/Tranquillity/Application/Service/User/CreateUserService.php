@@ -42,12 +42,13 @@ class CreateUserService implements ApplicationService
         // Check whether the user already exists
         $existingUser = $this->repository->findByUsername($request->username());
         if ($existingUser != null) {
-            return $this->exitWithError(
+            $this->dataTransformer->writeError(
                 ErrorCodeEnum::USER_ALREADY_EXISTS,
                 "A user already exists for this username ({$request->username()})",
                 'user',
                 'username'
             );
+            return $this->dataTransformer->read();
         }
 
         // Hash the password

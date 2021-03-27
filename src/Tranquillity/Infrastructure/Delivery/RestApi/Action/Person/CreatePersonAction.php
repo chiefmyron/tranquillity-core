@@ -14,6 +14,7 @@ use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class CreatePersonAction extends AbstractAction
 {
@@ -44,9 +45,11 @@ class CreatePersonAction extends AbstractAction
             $data['attributes']
         );
 
-        // Execute transaction to create new person
+        // Execute as a transaction
         $txnService = new TransactionalService($this->service, $this->txnSession);
+
+        /** @var RestResponse */
         $person = $txnService->execute($createPersonRequest);
-        return JsonApiResponder::writeResponse($request, $response, $person, HttpStatusCodeEnum::CREATED);
+        return $person->writeResponse($request, $response);
     }
 }

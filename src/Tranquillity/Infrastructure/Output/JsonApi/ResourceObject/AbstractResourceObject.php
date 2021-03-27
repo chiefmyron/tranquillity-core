@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Output\JsonApi\ResourceObject;
 
+use Carbon\Carbon;
 use Slim\Interfaces\RouteCollectorInterface;
 use Tranquillity\Domain\Model\DomainEntity;
 
@@ -88,9 +89,14 @@ abstract class AbstractResourceObject
         $this->links = $links;
     }
 
-    protected function urlForRoute(string $routeName, array $data = [], array $queryParams = []): string
+    protected function writeUrlForRoute(string $routeName, array $data = [], array $queryParams = []): string
     {
         return $this->routeCollector->getRouteParser()->urlFor($routeName, $data, $queryParams);
+    }
+
+    protected function writeDateTime(\DateTimeInterface $value): string
+    {
+        return Carbon::instance($value)->toIso8601String();
     }
 
     protected function applySparseFieldset(array $fields, array $requiredFields): array

@@ -6,9 +6,12 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\Json
 
 use Tranquillity\Application\DataTransformer\User\UserCollectionDataTransformer;
 use Tranquillity\Domain\Model\User\UserCollection;
+use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 use Tranquillity\Infrastructure\Output\JsonApi\AbstractDataTransformer;
 use Tranquillity\Infrastructure\Output\JsonApi\Document\DataCollectionDocument;
+use Tranquillity\Infrastructure\Output\JsonApi\ResourceObject\ErrorObject;
 use Tranquillity\Infrastructure\Output\JsonApi\ResourceObject\UserResourceCollection;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ListUsersDataTransformer extends AbstractDataTransformer implements UserCollectionDataTransformer
 {
@@ -19,6 +22,14 @@ class ListUsersDataTransformer extends AbstractDataTransformer implements UserCo
         $resourceObjects->populate($collection, $fields, $relatedResources);
 
         // Generate data collection document
-        $this->document = new DataCollectionDocument($resourceObjects);
+        $document = new DataCollectionDocument($resourceObjects);
+
+        // Generate REST API response
+        $this->apiResponse = new RestResponse($document, HttpStatusCodeEnum::OK);
+    }
+
+    public function setErrorSource(ErrorObject $errorObject, string $source, string $field): ErrorObject
+    {
+        return $errorObject;
     }
 }

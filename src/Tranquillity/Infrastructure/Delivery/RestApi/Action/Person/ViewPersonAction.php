@@ -9,8 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Application\Service\Person\ViewPersonRequest;
 use Tranquillity\Application\Service\Person\ViewPersonService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ViewPersonAction extends AbstractAction
 {
@@ -30,7 +29,8 @@ class ViewPersonAction extends AbstractAction
             $this->getIncludedResources($request)
         );
 
+        /** @var RestResponse */
         $person = $this->service->execute($viewPersonRequest);
-        return JsonApiResponder::writeResponse($request, $response, $person, HttpStatusCodeEnum::OK);
+        return $person->writeResponse($request, $response);
     }
 }

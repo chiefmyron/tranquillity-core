@@ -14,6 +14,18 @@ interface GenericDataTransformer
     public function read();
 
     /**
+     * Write a single error instead of entity data
+     *
+     * @param string $code
+     * @param string $detail
+     * @param string $source
+     * @param string $field
+     * @param array $meta
+     * @return void
+     */
+    public function writeError(string $code, string $detail, string $source = '', string $field = '', array $meta = []): void;
+
+    /**
      * Write a collection of validation errors instead of entity data
      *
      * @param Notification $notification

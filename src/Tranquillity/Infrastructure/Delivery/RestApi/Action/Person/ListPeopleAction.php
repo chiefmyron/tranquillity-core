@@ -9,8 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Application\Service\Person\ListPeopleRequest;
 use Tranquillity\Application\Service\Person\ListPeopleService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ListPeopleAction extends AbstractListAction
 {
@@ -33,7 +32,8 @@ class ListPeopleAction extends AbstractListAction
             $this->getPageSize($request)
         );
 
+        /** @var RestResponse */
         $people = $this->service->execute($listPeopleRequest);
-        return JsonApiResponder::writeResponse($request, $response, $people, HttpStatusCodeEnum::OK);
+        return $people->writeResponse($request, $response);
     }
 }

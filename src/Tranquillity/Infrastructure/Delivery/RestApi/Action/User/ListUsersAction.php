@@ -12,6 +12,7 @@ use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\JsonApiUserCollectionDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ListUsersAction extends AbstractListAction
 {
@@ -34,7 +35,8 @@ class ListUsersAction extends AbstractListAction
             $this->getPageSize($request)
         );
 
-        $people = $this->service->execute($listUsersRequest);
-        return JsonApiResponder::writeResponse($request, $response, $people, HttpStatusCodeEnum::OK);
+        /** @var RestResponse */
+        $users = $this->service->execute($listUsersRequest);
+        return $users->writeResponse($request, $response);
     }
 }

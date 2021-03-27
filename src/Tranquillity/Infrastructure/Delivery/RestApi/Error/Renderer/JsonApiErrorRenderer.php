@@ -7,12 +7,11 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Error\Renderer;
 use Slim\Exception\HttpException;
 use Slim\Interfaces\ErrorRendererInterface;
 use Throwable;
-use Tranquillity\Domain\Exception\DomainException;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 
 /**
- * JSONApi error response renderer
+ * JSON:api error response renderer
  *
  * Error objects are composed of the following members:
  *     id: a unique identifier for this particular occurrence of the problem.
@@ -37,9 +36,6 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
         if ($exception instanceof ValidationException) {
             // Validation error (or collection of errors) from a Domain entity
             $errors = $this->formatValidationException($exception, $displayErrorDetails);
-        } elseif ($exception instanceof DomainException) {
-            // Business logic error (or collection of errors) from the Domain
-            $errors = $this->formatDomainException($exception, $displayErrorDetails);
         } elseif ($exception instanceof HttpException) {
             // Framework HTTP exception
             $errors = $this->formatHttpException($exception, $displayErrorDetails);
@@ -54,13 +50,12 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
     private function formatValidationException(ValidationException $exception, bool $displayErrorDetails): array
     {
         // Get the set of notifications held inside the validation exception
-        $notification = $exception->getNotification();
-        if ($notification->hasItems() == false) {
+        if ($exception->hasErrors() == false) {
             return $this->formatGenericException($exception, $displayErrorDetails);
         }
 
         $errors = [];
-        foreach ($notification->getItems() as $item) {
+        foreach ($exception->getErrors() as $item) {
             // Build up error object detail
             $error = [
                 'status' => $item->getStatusCode(),
@@ -85,37 +80,6 @@ class JsonApiErrorRenderer implements ErrorRendererInterface
             $errors[] = $error;
         }
 
-        return $errors;
-    }
-
-    private function formatDomainException(DomainException $exception, bool $displayErrorDetails): array
-    {
-        // Build up error object detail
-        $error = [
-            'status' => $exception->getStatusCode(),
-            'title' => $exception->getTitle(),
-        ];
-
-        // Add extra detail if it has been provided
-        if ($exception->getErrorCode() != '') {
-            $error['code'] = $exception->getErrorCode();
-        }
-        if ($exception->getDetail() != '') {
-            $error['detail'] = $exception->getDetail();
-        }
-        if (is_null($exception->getSource()) == false) {
-            $error['source'] = $exception->getSource();
-        }
-
-        // If we are displaying error details, include them in the error metadata
-        if ($displayErrorDetails == true) {
-            $error['meta'] = [];
-            $error['meta']['exception'] = $this->formatExceptionDetails($exception);
-        }
-
-        // JSON:api error responses should always be an array of error objects
-        $errors = [];
-        $errors[] = $error;
         return $errors;
     }
 

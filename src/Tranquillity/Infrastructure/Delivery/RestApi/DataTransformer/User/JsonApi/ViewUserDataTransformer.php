@@ -6,9 +6,12 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\Json
 
 use Tranquillity\Application\DataTransformer\User\UserDataTransformer;
 use Tranquillity\Domain\Model\User\User;
+use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 use Tranquillity\Infrastructure\Output\JsonApi\AbstractDataTransformer;
 use Tranquillity\Infrastructure\Output\JsonApi\Document\DataDocument;
+use Tranquillity\Infrastructure\Output\JsonApi\ResourceObject\ErrorObject;
 use Tranquillity\Infrastructure\Output\JsonApi\ResourceObject\UserResourceObject;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ViewUserDataTransformer extends AbstractDataTransformer implements UserDataTransformer
 {
@@ -19,6 +22,25 @@ class ViewUserDataTransformer extends AbstractDataTransformer implements UserDat
         $resourceObject->populate($entity, $fields, $relatedResources);
 
         // Generate data collection document
-        $this->document = new DataDocument($resourceObject);
+        $document = new DataDocument($resourceObject);
+
+        // Generate REST API response
+        $this->apiResponse = new RestResponse($document, HttpStatusCodeEnum::OK);
+    }
+
+    public function setErrorSource(ErrorObject $errorObject, string $source, string $field): ErrorObject
+    {
+        switch ($field) {
+            case 'id':
+                $errorObject->setSource('pointer', '/data/id');
+                break;
+            case 'type':
+                $errorObject->setSource('pointer', '/data/type');
+                break;
+            default:
+                $errorObject->setSource('pointer', '/data/attributes/' . $field);
+                break;
+        }
+        return $errorObject;
     }
 }

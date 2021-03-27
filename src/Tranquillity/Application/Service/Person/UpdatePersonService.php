@@ -6,7 +6,7 @@ namespace Tranquillity\Application\Service\Person;
 
 use Tranquillity\Application\DataTransformer\Person\PersonDataTransformer;
 use Tranquillity\Application\Service\ApplicationService;
-use Tranquillity\Domain\Exception\Person\PersonDoesNotExistException;
+use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Model\Person\PersonId;
 use Tranquillity\Domain\Model\Person\PersonRepository;
 
@@ -40,8 +40,11 @@ class UpdatePersonService implements ApplicationService
         // Retrieve existing Person entity
         $person = $this->repository->findById(PersonId::create($id));
         if (is_null($person) == true) {
-            //throw new PersonDoesNotExistException("No person exists with ID {$request->id()}", 'pointer', '/data/id');
-            throw new \Exception("No person exists with ID {$id()}");
+            $this->dataTransformer->writeError(
+                ErrorCodeEnum::PERSON_DOES_NOT_EXIST,
+                "No person exists with ID {$id}"
+            );
+            return $this->dataTransformer->read();
         }
 
         // Update Person entity with new details

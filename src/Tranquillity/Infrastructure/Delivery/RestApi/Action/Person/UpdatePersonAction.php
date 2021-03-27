@@ -12,9 +12,7 @@ use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApiPersonDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
+use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class UpdatePersonAction extends AbstractAction
 {
@@ -40,16 +38,18 @@ class UpdatePersonAction extends AbstractAction
         }
 
         // Build request to update an existing person from payload
-        $createPersonRequest = UpdatePersonRequest::createFromArray(
+        $updatePersonRequest = UpdatePersonRequest::createFromArray(
             $id,
             $this->getSparseFieldset($request),
             $this->getIncludedResources($request),
             $data['attributes']
         );
 
-        // Execute transaction to update person
+        // Execute as a transaction
         $txnService = new TransactionalService($this->service, $this->txnSession);
-        $person = $txnService->execute($createPersonRequest);
-        return JsonApiResponder::writeResponse($request, $response, $person, HttpStatusCodeEnum::OK);
+
+        /** @var RestResponse */
+        $person = $txnService->execute($updatePersonRequest);
+        return $person->writeResponse($request, $response);
     }
 }

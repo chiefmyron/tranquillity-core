@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\DataTransformer\Person;
 
+use Tranquillity\Application\DataTransformer\GenericDataTransformer;
 use Tranquillity\Domain\Model\Person\Person;
 
-interface PersonDataTransformer
+interface PersonDataTransformer extends GenericDataTransformer
 {
     /**
      * @param Person $entity

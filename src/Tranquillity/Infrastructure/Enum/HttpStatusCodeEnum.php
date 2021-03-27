@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Enum;
 
+use Tranquillity\Domain\Enum\ErrorCodeEnum;
+
 /**
  * Enumeration of HTTP status codes
  *
@@ -85,4 +87,23 @@ class HttpStatusCodeEnum extends AbstractEnum
     public const NOT_EXTENDED = 510;
     public const NETWORK_AUTHENTICATION_REQUIRED = 511;
     public const NETWORK_CONNECT_TIMEOUT_ERROR = 599;
+
+    // Map application error codes to their equivalent HTTP status codes
+    public static function findErrorStatusCode(string $errorCode): int
+    {
+        switch ($errorCode) {
+            case ErrorCodeEnum::FIELD_VALIDATION_PASSWORD_INVALID:
+                return static::BAD_REQUEST;
+            case ErrorCodeEnum::FIELD_VALIDATION_MANDATORY_VALUE_MISSING:
+            case ErrorCodeEnum::FIELD_VALIDATION_EMAIL_FORMAT:
+            case ErrorCodeEnum::FIELD_VALIDATION_TIMEZONE_INVALID:
+            case ErrorCodeEnum::FIELD_VALIDATION_LOCALE_INVALID:
+            case ErrorCodeEnum::USER_ALREADY_EXISTS:
+                return static::UNPROCESSABLE_ENTITY;
+            case ErrorCodeEnum::PERSON_DOES_NOT_EXIST:
+                return static::NOT_FOUND;
+            default:
+                return static::INTERNAL_SERVER_ERROR;
+        };
+    }
 }
