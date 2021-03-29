@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" 
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
-    <entity name="Tranquillity\Domain\Model\Person\Person" repository-class="Tranquillity\Infrastructure\Domain\Model\Person\Doctrine\DoctrinePersonRepository" table="people">
+    <entity name="Tranquillity\Domain\Model\Person\Person" repository-class="Tranquillity\Infrastructure\Domain\Model\Person\Doctrine\DoctrinePersonRepository" table="bus_people">
         <id name="id" column="id" type="PersonId"/>
         <field name="firstName" type="string" nullable="false" />
         <field name="lastName" type="string" nullable="false" />

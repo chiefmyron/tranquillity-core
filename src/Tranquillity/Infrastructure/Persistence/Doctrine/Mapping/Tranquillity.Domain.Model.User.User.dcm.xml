@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" 
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
-    <entity name="Tranquillity\Domain\Model\User\User" repository-class="Tranquillity\Infrastructure\Domain\Model\User\Doctrine\DoctrineUserRepository" table="users">
+    <entity name="Tranquillity\Domain\Model\User\User" repository-class="Tranquillity\Infrastructure\Domain\Model\User\Doctrine\DoctrineUserRepository" table="bus_users">
         <id name="id" column="id" type="UserId"/>
         <field name="username" type="string" nullable="false" />
         <field name="timezoneCode" type="string" nullable="false" />
