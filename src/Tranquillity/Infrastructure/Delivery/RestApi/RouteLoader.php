@@ -46,8 +46,8 @@ class RouteLoader
             // // User resource
             $group->get('/users', User\ListUsersAction::class)->setName('user-list')->setArgument('auth-scope', 'users:read');
             $group->post('/users', User\CreateUserAction::class)->setArgument('auth-scope', 'users:write');
-            $group->get('/users/{id}', Person\ViewPersonAction::class)->setName('user-detail')->setArgument('auth-scope', 'users:read');
-            // $group->patch('/users/{id}', UserController::class.':update')->setArgument('auth-scope', 'users:write');
+            $group->get('/users/{id}', User\ViewUserAction::class)->setName('user-detail')->setArgument('auth-scope', 'users:read');
+            $group->patch('/users/{id}', User\UpdateUserAction::class)->setArgument('auth-scope', 'users:write');
             // $group->delete('/users/{id}', UserController::class.':delete')->setArgument('auth-scope', 'users:write');
             // $group->get('/users/{id}/{resource}', UserController::class.':showRelated')->setName('user-related')->setArgument('auth-scope', 'users:write');;
             // $group->get('/users/{id}/relationships/{resource}', UserController::class.':showRelationship')->setName('user-relationships')->setArgument('auth-scope', 'users:write');;

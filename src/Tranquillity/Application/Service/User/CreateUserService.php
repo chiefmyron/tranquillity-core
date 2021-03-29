@@ -36,7 +36,7 @@ class CreateUserService implements ApplicationService
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \RuntimeException("A '" . CreateUserRequest::class . "' must be supplied to this service!");
+            throw new \InvalidArgumentException("A '" . CreateUserRequest::class . "' must be supplied to this service!");
         }
 
         // Check whether the user already exists

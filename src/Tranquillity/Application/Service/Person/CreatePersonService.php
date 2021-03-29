@@ -28,7 +28,7 @@ class CreatePersonService implements ApplicationService
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \Exception("A '" . CreatePersonRequest::class . "' must be supplied to this service!");
+            throw new \InvalidArgumentException("A '" . CreatePersonRequest::class . "' must be supplied to this service!");
         }
 
         // Get request details

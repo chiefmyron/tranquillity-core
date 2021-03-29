@@ -29,7 +29,7 @@ class UpdatePersonService implements ApplicationService
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \Exception("An '" . UpdatePersonRequest::class . "' must be supplied to this service!");
+            throw new \InvalidArgumentException("An '" . UpdatePersonRequest::class . "' must be supplied to this service!");
         }
 
         // Get request details

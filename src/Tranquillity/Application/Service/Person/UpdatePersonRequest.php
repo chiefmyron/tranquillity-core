@@ -12,9 +12,10 @@ class UpdatePersonRequest
     private ?string $jobTitle;
     private ?string $emailAddress;
 
-    private array $updatedAttributes = [];
     private array $fields = [];
     private array $relatedResources = [];
+
+    private array $updatedAttributes = [];
 
     public function __construct(
         string $id,
