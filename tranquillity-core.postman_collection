@@ -1,0 +1,429 @@
+{
+	"info": {
+		"_postman_id": "589ff6f2-8e0d-416e-91bd-96809bf9d54c",
+		"name": "Tranquillity API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Person",
+					"item": [
+						{
+							"name": "List People",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Base_Url}}/v1/people?page[number]=1&page[size]=250",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"people"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										},
+										{
+											"key": "page[number]",
+											"value": "1"
+										},
+										{
+											"key": "page[size]",
+											"value": "250"
+										},
+										{
+											"key": "fields[person]",
+											"value": "firstName,lastName",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View Person",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Base_Url}}/v1/people/ec333af0-6819-11eb-997d-e0d55ee3683b",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"people",
+										"ec333af0-6819-11eb-997d-e0d55ee3683b"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										},
+										{
+											"key": "fields[person]",
+											"value": "lastName",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Person",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"data\": {\n\t\t\"type\": \"person\",\n\t\t\"attributes\": {\n\t\t\t\"firstName\": \"Andrew\",\n\t\t\t\"lastName\": \"Patterson\",\n\t\t\t\"jobTitle\": \"The Architect\",\n            \"emailAddress\": \"testing@gmail.com\"\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{Base_Url}}/v1/people",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"people"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Person",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"data\": {\n\t\t\"type\": \"person\",\n\t\t\"attributes\": {\n\t\t\t\"emailAddress\": \"steve@steve.com\"\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{Base_Url}}/v1/people/9f8049c0-8c43-11eb-b5c5-e0d55ee3683b?XDEBUG_SESSION=session_name",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"people",
+										"9f8049c0-8c43-11eb-b5c5-e0d55ee3683b"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "List Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Base_Url}}/v1/users?page[number]=1&page[size]=250",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"users"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										},
+										{
+											"key": "page[number]",
+											"value": "1"
+										},
+										{
+											"key": "page[size]",
+											"value": "250"
+										},
+										{
+											"key": "fields[person]",
+											"value": "firstName,lastName",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View User",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Base_Url}}/v1/users/f9851f2e-7fb2-11eb-b4f8-e0d55ee3683b",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"users",
+										"f9851f2e-7fb2-11eb-b4f8-e0d55ee3683b"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"data\": {\n\t\t\"type\": \"user\",\n\t\t\"attributes\": {\n\t\t\t\"username\": \"TEst\",\n            \"password\": \"password\",\n\t\t\t\"timezoneCode\": \"Australia/Brisbane\",\n            \"localeCode\": \"en_AU\",\n            \"active\": true\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{Base_Url}}/v1/users",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"users"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"data\": {\n\t\t\"type\": \"user\",\n\t\t\"attributes\": {\n\t\t\t\"localeCode\": \"en_AU\"\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{Base_Url}}/v1/users/f9851f2e-7fb2-11eb-b4f8-e0d55ee3683b",
+									"host": [
+										"{{Base_Url}}"
+									],
+									"path": [
+										"v1",
+										"users",
+										"f9851f2e-7fb2-11eb-b4f8-e0d55ee3683b"
+									],
+									"query": [
+										{
+											"key": "XDEBUG_SESSION",
+											"value": "session_name",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{OAuth_Token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Login - Token request (client credentials)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"OAuth_Token\", data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "test_client",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "test",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{Base_Url}}/v1/auth/token?XDEBUG_SESSION=session_name",
+					"host": [
+						"{{Base_Url}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "XDEBUG_SESSION",
+							"value": "session_name"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
