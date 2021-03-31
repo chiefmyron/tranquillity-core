@@ -6,21 +6,30 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\ServiceProvider;
 
 use Psr\Container\ContainerInterface;
 use DI\ContainerBuilder;
-use Doctrine\ORM\EntityManagerInterface;
-use OAuth2\Server as OAuth2Server;
+use OAuth2\Server;
 use OAuth2\GrantType\ClientCredentials;
 use OAuth2\GrantType\UserCredentials;
 use OAuth2\GrantType\AuthorizationCode;
 use OAuth2\GrantType\RefreshToken;
 use OAuth2\Scope;
-use Tranquillity\Data\Entities\OAuth\AccessTokenEntity;
-use Tranquillity\Data\Entities\OAuth\AuthorisationCodeEntity;
-use Tranquillity\Data\Entities\OAuth\ClientEntity;
-use Tranquillity\Data\Entities\OAuth\RefreshTokenEntity;
-use Tranquillity\Data\Entities\Business\UserEntity;
-use Tranquillity\Data\Entities\OAuth\ScopeEntity;
-use Tranquillity\Domain\Service\User\HashingService;
-use Tranquillity\Infrastructure\Domain\Service\User\NativePhpHashingService;
+use Tranquillity\Application\Service\Auth\ViewAccessTokenByTokenService;
+use Tranquillity\Application\Service\Auth\CreateAccessTokenService;
+use Tranquillity\Application\Service\Auth\ViewClientByNameService;
+use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Application\Service\Auth\ViewUserByUsernameService;
+use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\ClientRepository;
+use Tranquillity\Domain\Model\Auth\UserRepository;
+use Tranquillity\Domain\Service\Auth\VerifyClientCredentialsService;
+use Tranquillity\Domain\Service\Auth\VerifyUserCredentialsService;
+use Tranquillity\Domain\Service\Auth\HashingService;
+use Tranquillity\Infrastructure\Authentication\OAuth\AccessTokenProvider;
+use Tranquillity\Infrastructure\Authentication\OAuth\ClientProvider;
+use Tranquillity\Infrastructure\Authentication\OAuth\UserProvider;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewAccessTokenDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewClientDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewUserDataTransformer;
+use Tranquillity\Infrastructure\Domain\Service\Auth\NativePhpHashingService;
 
 class AuthenticationServiceProvider extends AbstractServiceProvider
 {
@@ -40,41 +49,66 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
                 $options = $config->get('auth.password_options', []);
 
                 return new NativePhpHashingService($algorithm, $options);
-            }
+            },
+
+            // Register providers for OAuth entities
+            ClientProvider::class => function (ContainerInterface $c) {
+                $repository = $c->get(ClientRepository::class);
+                $viewService = new ViewClientByNameService($repository, new ViewClientDataTransformer());
+                $verifyService = new VerifyClientCredentialsService($repository, $c->get(HashingService::class));
+
+                return new ClientProvider($viewService, $verifyService);
+            },
+            UserProvider::class => function (ContainerInterface $c) {
+                $repository = $c->get(UserRepository::class);
+                $viewService = new ViewUserByUsernameService($repository, new ViewUserDataTransformer());
+                $verifyService = new VerifyUserCredentialsService($repository, $c->get(HashingService::class));
+
+                return new UserProvider($viewService, $verifyService);
+            },
+            AccessTokenProvider::class => function (ContainerInterface $c) {
+                $tokenRepository = $c->get(AccessTokenRepository::class);
+                $clientRepository = $c->get(ClientRepository::class);
+                $userRepository = $c->get(UserRepository::class);
+                $viewService = new ViewAccessTokenByTokenService($tokenRepository, new ViewAccessTokenDataTransformer());
+                $createService = new CreateAccessTokenService($tokenRepository, $clientRepository, $userRepository, new ViewAccessTokenDataTransformer());
+                $txnService = $c->get(TransactionalSession::class);
+
+                return new AccessTokenProvider($viewService, $createService, $txnService);
+            },
 
             // Register OAuth2 server with the container
-            /*OAuth2Server::class => function (ContainerInterface $c) {
+            Server::class => function (ContainerInterface $c) {
                 // Get entities used to represent OAuth objects
-                $em = $c->get(EntityManagerInterface::class);
-                $clientStorage = $em->getRepository(ClientEntity::class);
-                $userStorage = $em->getRepository(UserEntity::class);
-                $accessTokenStorage = $em->getRepository(AccessTokenEntity::class);
-                $refreshTokenStorage = $em->getRepository(RefreshTokenEntity::class);
+                $clientStorage = $c->get(ClientProvider::class);
+                $userStorage = $c->get(UserProvider::class);
+                $accessTokenStorage = $c->get(AccessTokenProvider::class);
+                /*$refreshTokenStorage = $em->getRepository(RefreshTokenEntity::class);
                 $authorisationCodeStorage = $em->getRepository(AuthorisationCodeEntity::class);
-                $scopeStorage = $em->getRepository(ScopeEntity::class);
+                $scopeStorage = $em->getRepository(ScopeEntity::class);*/
 
                 // Create OAuth2 server
                 $storage = [
                     'client_credentials' => $clientStorage,
                     'user_credentials'   => $userStorage,
-                    'access_token'       => $accessTokenStorage,
-                    'refresh_token'      => $refreshTokenStorage,
-                    'authorization_code' => $authorisationCodeStorage
+                    'access_token'       => $accessTokenStorage
+                    //'refresh_token'      => $refreshTokenStorage,
+                    //'authorization_code' => $authorisationCodeStorage
                 ];
-                $server = new OAuth2Server($storage, ['auth_code_lifetime' => 30, 'refresh_token_lifetime' => 30]);
+                $server = new Server($storage, ['auth_code_lifetime' => 30, 'refresh_token_lifetime' => 30]);
 
                 // Create scope storage manager
-                $scope = new Scope($scopeStorage);
-                $server->setScopeUtil($scope);
+                //$scope = new Scope($scopeStorage);
+                //$server->setScopeUtil($scope);
 
                 // Add grant types
                 $server->addGrantType(new ClientCredentials($clientStorage));
                 $server->addGrantType(new UserCredentials($userStorage));
-                $server->addGrantType(new AuthorizationCode($authorisationCodeStorage));
-                $server->addGrantType(new RefreshToken($refreshTokenStorage, ['always_issue_new_refresh_token' => true]));
+                //$server->addGrantType(new AuthorizationCode($authorisationCodeStorage));
+                //$server->addGrantType(new RefreshToken($refreshTokenStorage, ['always_issue_new_refresh_token' => true]));
 
                 return $server;
-            }*/
+            }
         ]);
     }
 }

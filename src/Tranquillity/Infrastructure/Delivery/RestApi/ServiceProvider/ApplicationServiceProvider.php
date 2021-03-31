@@ -8,22 +8,26 @@ use DI\ContainerBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Slim\Interfaces\RouteCollectorInterface;
+use Tranquillity\Application\DataTransformer\Auth\UserCollectionDataTransformer;
+use Tranquillity\Application\DataTransformer\Auth\UserDataTransformer;
 use Tranquillity\Application\DataTransformer\Person\PersonCollectionDataTransformer;
 use Tranquillity\Application\DataTransformer\Person\PersonDataTransformer;
-use Tranquillity\Application\DataTransformer\User\UserCollectionDataTransformer;
-use Tranquillity\Application\DataTransformer\User\UserDataTransformer;
 use Tranquillity\Application\Service\TransactionalSession;
 use Tranquillity\Domain\Event\DomainEventPublisher;
 use Tranquillity\Domain\Event\DomainEventStore;
 use Tranquillity\Domain\Event\StoredEvent;
+use Tranquillity\Domain\Model\Auth\AccessToken;
+use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\Client;
+use Tranquillity\Domain\Model\Auth\ClientRepository;
+use Tranquillity\Domain\Model\Auth\User;
+use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Model\Person\Person;
 use Tranquillity\Domain\Model\Person\PersonRepository;
-use Tranquillity\Domain\Model\User\User;
-use Tranquillity\Domain\Model\User\UserRepository;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\JsonApi\ListUsersDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\JsonApi\ViewUserDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApi\ListPeopleDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Person\JsonApi\ViewPersonDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\JsonApi\ListUsersDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\JsonApi\ViewUserDataTransformer;
 use Tranquillity\Infrastructure\Persistence\Doctrine\DoctrineTransactionalSession;
 
 /**
@@ -39,6 +43,14 @@ class ApplicationServiceProvider extends AbstractServiceProvider
     {
         $containerBuilder->addDefinitions([
             // Register repositories
+            AccessTokenRepository::class => function (ContainerInterface $c): AccessTokenRepository {
+                $em = $c->get(EntityManagerInterface::class);
+                return $em->getRepository(AccessToken::class);
+            },
+            ClientRepository::class => function (ContainerInterface $c): ClientRepository {
+                $em = $c->get(EntityManagerInterface::class);
+                return $em->getRepository(Client::class);
+            },
             PersonRepository::class => function (ContainerInterface $c): PersonRepository {
                 $em = $c->get(EntityManagerInterface::class);
                 return $em->getRepository(Person::class);

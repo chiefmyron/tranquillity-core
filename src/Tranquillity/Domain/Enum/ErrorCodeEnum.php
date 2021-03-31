@@ -15,8 +15,13 @@ final class ErrorCodeEnum
 
     // Entity-specific error codes
     public const PERSON_DOES_NOT_EXIST = '20001';
+
     public const USER_DOES_NOT_EXIST = '20101';
     public const USER_ALREADY_EXISTS = '20102';
+
+    public const OAUTH_CLIENT_DOES_NOT_EXIST = '20201';
+    public const OAUTH_ACCESS_TOKEN_DOES_NOT_EXIST = '20202';
+    public const OAUTH_ACCESS_TOKEN_ALREADY_EXISTS = '20203';
 
     public static function title(string $errorCode): string
     {

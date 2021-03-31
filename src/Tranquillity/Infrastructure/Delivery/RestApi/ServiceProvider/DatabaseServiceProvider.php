@@ -15,11 +15,12 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
-use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
+use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineAccessTokenId;
+use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineClientId;
+use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineUserId;
 use Tranquillity\Infrastructure\Domain\Model\Person\Doctrine\DoctrinePersonId;
-use Tranquillity\Infrastructure\Domain\Model\User\Doctrine\DoctrineUserId;
 use Tranquillity\Infrastructure\Persistence\Doctrine\TablePrefixExtension;
 
 class DatabaseServiceProvider extends AbstractServiceProvider
@@ -58,6 +59,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider
                 // Create Doctrine entity manager
                 try {
                     // Register entity ID types
+                    Type::addType('AccessTokenId', DoctrineAccessTokenId::class);
+                    Type::addType('ClientId', DoctrineClientId::class);
                     Type::addType('PersonId', DoctrinePersonId::class);
                     Type::addType('UserId', DoctrineUserId::class);
 

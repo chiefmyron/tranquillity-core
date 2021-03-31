@@ -36,7 +36,7 @@ class MiddlewareLoader
         // Register middlewares
         $app->add(ProfilerMiddleware::class);
         $app->add(EventSubscriberMiddleware::class);
-        $app->add(JsonApiRequestValidationMiddleware::class);
+        //$app->add(JsonApiRequestValidationMiddleware::class);
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
         //$app->add(ContentLengthMiddleware::class);

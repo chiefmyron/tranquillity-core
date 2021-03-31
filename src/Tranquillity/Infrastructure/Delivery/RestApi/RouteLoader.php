@@ -6,8 +6,11 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi;
 
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
+use Tranquillity\Infrastructure\Delivery\RestApi\Action\Auth;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\Person;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
+use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\AuthenticationMiddleware;
+use Tranquillity\Infrastructure\Delivery\RestApi\Middleware\JsonApiRequestValidationMiddleware;
 
 class RouteLoader
 {
@@ -27,7 +30,7 @@ class RouteLoader
         $app->get('/', function ($request, $response, array $args) {
             echo "hello world!";
         });
-        //$app->post('/v1/auth/token', AuthController::class.':token');
+        $app->post('/v1/auth/token', Auth\TokenRequestAction::class);
 
         // Version 1 API route group (authenticated)
         $routeGroup = $app->group('/v1', function (RouteCollectorProxy $group) {
@@ -77,8 +80,8 @@ class RouteLoader
 
         // Version 1 API route group (authenticated) middleware
         $routeMiddleware = [
-            //AuthenticationMiddleware::class,
-            //JsonApiRequestValidatorMiddleware::class
+            AuthenticationMiddleware::class,
+            JsonApiRequestValidationMiddleware::class
         ];
         foreach ($routeMiddleware as $middleware) {
             $routeGroup->add($middleware);
