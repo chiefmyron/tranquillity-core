@@ -6,8 +6,8 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\User\ViewUserRequest;
-use Tranquillity\Application\Service\User\ViewUserService;
+use Tranquillity\Application\Service\ViewUser\ViewUserRequest;
+use Tranquillity\Application\Service\ViewUser\ViewUserService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 

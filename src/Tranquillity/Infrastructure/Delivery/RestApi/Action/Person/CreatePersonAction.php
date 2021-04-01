@@ -6,14 +6,12 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\Person;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\Person\CreatePersonRequest;
-use Tranquillity\Application\Service\Person\CreatePersonService;
+use Tranquillity\Application\Service\CreatePerson\CreatePersonRequest;
+use Tranquillity\Application\Service\CreatePerson\CreatePersonService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class CreatePersonAction extends AbstractAction

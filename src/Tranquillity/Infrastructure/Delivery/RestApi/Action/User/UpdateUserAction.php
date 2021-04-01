@@ -6,10 +6,10 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\User\UpdateUserRequest;
-use Tranquillity\Application\Service\User\UpdateUserService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Application\Service\UpdateUser\UpdateUserRequest;
+use Tranquillity\Application\Service\UpdateUser\UpdateUserService;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;

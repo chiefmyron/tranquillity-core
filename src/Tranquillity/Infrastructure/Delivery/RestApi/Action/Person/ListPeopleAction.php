@@ -6,8 +6,8 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\Person;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\Person\ListPeopleRequest;
-use Tranquillity\Application\Service\Person\ListPeopleService;
+use Tranquillity\Application\Service\ListPeople\ListPeopleRequest;
+use Tranquillity\Application\Service\ListPeople\ListPeopleService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
 use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 

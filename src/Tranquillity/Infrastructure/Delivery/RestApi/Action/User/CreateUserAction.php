@@ -6,8 +6,8 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\User\CreateUserRequest;
-use Tranquillity\Application\Service\User\CreateUserService;
+use Tranquillity\Application\Service\CreateUser\CreateUserRequest;
+use Tranquillity\Application\Service\CreateUser\CreateUserService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
 use Tranquillity\Domain\Enum\EntityTypeEnum;

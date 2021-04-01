@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Tranquillity\Infrastructure\Authentication\OAuth;
 
 use OAuth2\Storage\ClientCredentialsInterface;
-use Tranquillity\Application\Service\Auth\ViewClientByNameService;
-use Tranquillity\Application\Service\Auth\ViewClientByNameRequest;
+use Tranquillity\Application\Service\FindClientByName\FindClientByNameRequest;
+use Tranquillity\Application\Service\FindClientByName\FindClientByNameService;
 use Tranquillity\Domain\Service\Auth\VerifyClientCredentialsService;
 
 class ClientProvider implements ClientCredentialsInterface
 {
-    private ViewClientByNameService $viewService;
+    private FindClientByNameService $viewService;
     private VerifyClientCredentialsService $verifyService;
 
-    public function __construct(ViewClientByNameService $viewService, VerifyClientCredentialsService $verifyService)
+    public function __construct(FindClientByNameService $viewService, VerifyClientCredentialsService $verifyService)
     {
         $this->viewService = $viewService;
         $this->verifyService = $verifyService;
@@ -25,7 +25,7 @@ class ClientProvider implements ClientCredentialsInterface
      */
     public function getClientDetails($client_id): array
     {
-        $request = new ViewClientByNameRequest($client_id);
+        $request = new FindClientByNameRequest($client_id);
         return $this->viewService->execute($request);
     }
 

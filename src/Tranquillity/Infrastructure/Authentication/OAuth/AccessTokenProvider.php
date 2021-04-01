@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Tranquillity\Infrastructure\Authentication\OAuth;
 
 use OAuth2\Storage\AccessTokenInterface;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenRequest;
-use Tranquillity\Application\Service\Auth\ViewAccessTokenByTokenRequest;
-use Tranquillity\Application\Service\Auth\ViewAccessTokenByTokenService;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenService;
+use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenRequest;
+use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenService;
+use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenRequest;
+use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
 
 class AccessTokenProvider implements AccessTokenInterface
 {
-    private ViewAccessTokenByTokenService $viewService;
+    private FindAccessTokenByTokenService $viewService;
     private CreateAccessTokenService $createService;
     private TransactionalSession $txnSession;
 
-    public function __construct(ViewAccessTokenByTokenService $viewService, CreateAccessTokenService $createService, TransactionalSession $txn)
+    public function __construct(FindAccessTokenByTokenService $viewService, CreateAccessTokenService $createService, TransactionalSession $txn)
     {
         $this->viewService = $viewService;
         $this->createService = $createService;
@@ -30,7 +30,7 @@ class AccessTokenProvider implements AccessTokenInterface
      */
     public function getAccessToken($oauth_token)
     {
-        $request = new ViewAccessTokenByTokenRequest($oauth_token);
+        $request = new FindAccessTokenByTokenRequest($oauth_token);
         return $this->viewService->execute($request);
     }
 

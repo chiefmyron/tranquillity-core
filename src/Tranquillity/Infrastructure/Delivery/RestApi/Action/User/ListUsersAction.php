@@ -6,12 +6,9 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\User;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tranquillity\Application\Service\User\ListUsersRequest;
-use Tranquillity\Application\Service\User\ListUsersService;
+use Tranquillity\Application\Service\ListUsers\ListUsersRequest;
+use Tranquillity\Application\Service\ListUsers\ListUsersService;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractListAction;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\User\JsonApiUserCollectionDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\Responder\JsonApiResponder;
-use Tranquillity\Infrastructure\Enum\HttpStatusCodeEnum;
 use Tranquillity\Infrastructure\Output\JsonApi\RestResponse;
 
 class ListUsersAction extends AbstractListAction

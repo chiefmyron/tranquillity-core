@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\ServiceProvider;
 
-use Psr\Container\ContainerInterface;
 use DI\ContainerBuilder;
 use OAuth2\Server;
 use OAuth2\GrantType\ClientCredentials;
@@ -12,11 +11,12 @@ use OAuth2\GrantType\UserCredentials;
 use OAuth2\GrantType\AuthorizationCode;
 use OAuth2\GrantType\RefreshToken;
 use OAuth2\Scope;
-use Tranquillity\Application\Service\Auth\ViewAccessTokenByTokenService;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenService;
-use Tranquillity\Application\Service\Auth\ViewClientByNameService;
+use Psr\Container\ContainerInterface;
+use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenService;
+use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenService;
 use Tranquillity\Application\Service\TransactionalSession;
-use Tranquillity\Application\Service\Auth\ViewUserByUsernameService;
+use Tranquillity\Application\Service\FindClientByName\FindClientByNameService;
+use Tranquillity\Application\Service\FindUserByUsername\FindUserByUsernameService;
 use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
 use Tranquillity\Domain\Model\Auth\UserRepository;
@@ -26,10 +26,10 @@ use Tranquillity\Domain\Service\Auth\HashingService;
 use Tranquillity\Infrastructure\Authentication\OAuth\AccessTokenProvider;
 use Tranquillity\Infrastructure\Authentication\OAuth\ClientProvider;
 use Tranquillity\Infrastructure\Authentication\OAuth\UserProvider;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewAccessTokenDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewClientDataTransformer;
-use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ViewUserDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\AccessTokenDataTransformer;
 use Tranquillity\Infrastructure\Domain\Service\Auth\NativePhpHashingService;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\ClientDataTransformer;
+use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\UserDataTransformer;
 
 class AuthenticationServiceProvider extends AbstractServiceProvider
 {
@@ -54,14 +54,14 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
             // Register providers for OAuth entities
             ClientProvider::class => function (ContainerInterface $c) {
                 $repository = $c->get(ClientRepository::class);
-                $viewService = new ViewClientByNameService($repository, new ViewClientDataTransformer());
+                $viewService = new FindClientByNameService($repository, new ClientDataTransformer());
                 $verifyService = new VerifyClientCredentialsService($repository, $c->get(HashingService::class));
 
                 return new ClientProvider($viewService, $verifyService);
             },
             UserProvider::class => function (ContainerInterface $c) {
                 $repository = $c->get(UserRepository::class);
-                $viewService = new ViewUserByUsernameService($repository, new ViewUserDataTransformer());
+                $viewService = new FindUserByUsernameService($repository, new UserDataTransformer());
                 $verifyService = new VerifyUserCredentialsService($repository, $c->get(HashingService::class));
 
                 return new UserProvider($viewService, $verifyService);
@@ -70,8 +70,8 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
                 $tokenRepository = $c->get(AccessTokenRepository::class);
                 $clientRepository = $c->get(ClientRepository::class);
                 $userRepository = $c->get(UserRepository::class);
-                $viewService = new ViewAccessTokenByTokenService($tokenRepository, new ViewAccessTokenDataTransformer());
-                $createService = new CreateAccessTokenService($tokenRepository, $clientRepository, $userRepository, new ViewAccessTokenDataTransformer());
+                $viewService = new FindAccessTokenByTokenService($tokenRepository, new AccessTokenDataTransformer());
+                $createService = new CreateAccessTokenService($tokenRepository, $clientRepository, $userRepository, new AccessTokenDataTransformer());
                 $txnService = $c->get(TransactionalSession::class);
 
                 return new AccessTokenProvider($viewService, $createService, $txnService);
