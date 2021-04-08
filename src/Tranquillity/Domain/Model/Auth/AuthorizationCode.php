@@ -7,45 +7,48 @@ namespace Tranquillity\Domain\Model\Auth;
 use DateTime;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
-use Tranquillity\Domain\Event\Auth\AccessTokenCreated;
+use Tranquillity\Domain\Event\Auth\AuthorizationCodeCreated;
 use Tranquillity\Domain\Event\DomainEventPublisher;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\DomainEntity;
 use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Validation\Notification;
 
-class AccessToken extends DomainEntity
+class AuthorizationCode extends DomainEntity
 {
-    private AccessTokenId $id;
-    private string $token;
+    private AuthorizationCodeId $id;
+    private string $code;
     private Client $client;
     private ?User $user;
     private DateTime $expires;
+    private string $redirectUri;
     private ?string $scope;
 
     /**
      * Constructor
      *
-     * @param AccessTokenId $id
-     * @param string $token
+     * @param AuthorizationCodeId $id
+     * @param string $code
      * @param Client $client
      * @param User $user
      * @param DateTime $expires
      * @param string|null $scope
      */
     public function __construct(
-        AccessTokenId $id,
-        string $token,
+        AuthorizationCodeId $id,
+        string $code,
         Client $client,
         ?User $user,
         DateTime $expires,
+        string $redirectUri,
         ?string $scope
     ) {
         $this->id = $id;
-        $this->token = $token;
+        $this->code = $code;
         $this->client = $client;
         $this->user = $user;
         $this->expires = $expires;
+        $this->redirectUri = $redirectUri;
         $this->scope = $scope;
 
         // Ensure entity is valid after creation
@@ -58,9 +61,9 @@ class AccessToken extends DomainEntity
             );
         }
 
-        // Publish access token creation
+        // Publish authorization code creation
         DomainEventPublisher::instance()->publish(
-            new AccessTokenCreated($this->id)
+            new AuthorizationCodeCreated($this->id)
         );
     }
 
@@ -111,17 +114,17 @@ class AccessToken extends DomainEntity
 
     public function getEntityType(): string
     {
-        return EntityTypeEnum::OAUTH_TOKEN_ACCESS;
+        return EntityTypeEnum::OAUTH_CODE_AUTHORIZATION;
     }
 
-    public function id(): AccessTokenId
+    public function id(): AuthorizationCodeId
     {
         return $this->id;
     }
 
-    public function token(): string
+    public function code(): string
     {
-        return $this->token;
+        return $this->code;
     }
 
     public function clientId(): ClientId
@@ -137,6 +140,11 @@ class AccessToken extends DomainEntity
     public function expires(): DateTime
     {
         return $this->expires;
+    }
+
+    public function redirectUri(): string
+    {
+        return $this->redirectUri();
     }
 
     public function scope(): ?string
@@ -163,7 +171,7 @@ class AccessToken extends DomainEntity
         $notification = new Notification();
 
         // Check mandatory fields
-        $mandatoryFields = ['token'];
+        $mandatoryFields = ['code'];
         foreach ($mandatoryFields as $fieldName) {
             if (trim($this->$fieldName) == '') {
                 $notification->addItem(ErrorCodeEnum::FIELD_VALIDATION_MANDATORY_VALUE_MISSING, "Mandatory field '{$fieldName}' has not been provided", 'user', $fieldName);

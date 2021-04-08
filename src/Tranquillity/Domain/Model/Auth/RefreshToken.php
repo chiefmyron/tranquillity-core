@@ -7,16 +7,16 @@ namespace Tranquillity\Domain\Model\Auth;
 use DateTime;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
-use Tranquillity\Domain\Event\Auth\AccessTokenCreated;
+use Tranquillity\Domain\Event\Auth\RefreshTokenCreated;
 use Tranquillity\Domain\Event\DomainEventPublisher;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\DomainEntity;
 use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Validation\Notification;
 
-class AccessToken extends DomainEntity
+class RefreshToken extends DomainEntity
 {
-    private AccessTokenId $id;
+    private RefreshTokenId $id;
     private string $token;
     private Client $client;
     private ?User $user;
@@ -26,7 +26,7 @@ class AccessToken extends DomainEntity
     /**
      * Constructor
      *
-     * @param AccessTokenId $id
+     * @param RefreshTokenId $id
      * @param string $token
      * @param Client $client
      * @param User $user
@@ -34,7 +34,7 @@ class AccessToken extends DomainEntity
      * @param string|null $scope
      */
     public function __construct(
-        AccessTokenId $id,
+        RefreshTokenId $id,
         string $token,
         Client $client,
         ?User $user,
@@ -58,9 +58,9 @@ class AccessToken extends DomainEntity
             );
         }
 
-        // Publish access token creation
+        // Publish refresh token creation
         DomainEventPublisher::instance()->publish(
-            new AccessTokenCreated($this->id)
+            new RefreshTokenCreated($this->id)
         );
     }
 
@@ -114,7 +114,7 @@ class AccessToken extends DomainEntity
         return EntityTypeEnum::OAUTH_TOKEN_ACCESS;
     }
 
-    public function id(): AccessTokenId
+    public function id(): RefreshTokenId
     {
         return $this->id;
     }

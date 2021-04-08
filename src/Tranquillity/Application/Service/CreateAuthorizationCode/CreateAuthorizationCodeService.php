@@ -2,57 +2,56 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Application\Service\CreateAccessToken;
+namespace Tranquillity\Application\Service\CreateAuthorizationCode;
 
 use Tranquillity\Application\Service\ApplicationService;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenRequest;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Exception\ValidationException;
-use Tranquillity\Domain\Model\Auth\AccessToken;
-use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\AuthorizationCode;
+use Tranquillity\Domain\Model\Auth\AuthorizationCodeRepository;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
 use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Validation\Notification;
 
-class CreateAccessTokenService implements ApplicationService
+class CreateAuthorizationCodeService implements ApplicationService
 {
-    private AccessTokenRepository $tokenRepository;
+    private AuthorizationCodeRepository $codeRepository;
     private ClientRepository $clientRepository;
     private UserRepository $userRepository;
-    private CreateAccessTokenDataTransformer $dataTransformer;
+    private CreateAuthorizationCodeDataTransformer $dataTransformer;
 
     public function __construct(
-        AccessTokenRepository $tokenRepository,
+        AuthorizationCodeRepository $codeRepository,
         ClientRepository $clientRepository,
         UserRepository $userRepository,
-        CreateAccessTokenDataTransformer $dataTransformer
+        CreateAuthorizationCodeDataTransformer $dataTransformer
     ) {
-        $this->tokenRepository = $tokenRepository;
+        $this->codeRepository = $codeRepository;
         $this->clientRepository = $clientRepository;
         $this->userRepository = $userRepository;
         $this->dataTransformer = $dataTransformer;
     }
 
     /**
-     * @param CreateAccessTokenRequest $request
+     * @param CreateAuthorizationCodeRequest $request
      * @return mixed
      */
     public function execute($request = null)
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \InvalidArgumentException("A '" . CreateAccessTokenRequest::class . "' must be supplied to this service!");
+            throw new \InvalidArgumentException("A '" . CreateAuthorizationCodeRequest::class . "' must be supplied to this service!");
         }
 
-        // Check whether the user already exists
-        $token = $this->tokenRepository->findByToken($request->token());
-        if ($token != null) {
+        // Check whether the code already exists
+        $code = $this->codeRepository->findByCode($request->code());
+        if ($code != null) {
             $this->dataTransformer->writeError(
-                ErrorCodeEnum::OAUTH_ACCESS_TOKEN_ALREADY_EXISTS,
-                "An access token already exists for this value ({$request->token()})",
-                'access_token',
-                'token'
+                ErrorCodeEnum::OAUTH_AUTHORIZATION_CODE_ALREADY_EXISTS,
+                "An authorization code already exists for this value ({$request->code()})",
+                'authorization_code',
+                'code'
             );
             return $this->dataTransformer->read();
         }
@@ -74,14 +73,15 @@ class CreateAccessTokenService implements ApplicationService
             $user = $this->userRepository->findByUsername($request->username());
         }
 
-        // Create new AccessToken entity
+        // Create new AuthorizationCode entity
         try {
-            $accessToken = new AccessToken(
-                $this->tokenRepository->nextIdentity(),
-                $request->token(),
+            $code = new AuthorizationCode(
+                $this->codeRepository->nextIdentity(),
+                $request->code(),
                 $client,
                 $user,
                 $request->expires(),
+                $request->redirectUri(),
                 $request->scope()
             );
         } catch (ValidationException $ex) {
@@ -89,11 +89,11 @@ class CreateAccessTokenService implements ApplicationService
             return $this->exitWithErrorCollection($ex->getErrors());
         }
 
-        // Persist the new AccessToken entity
-        $this->tokenRepository->add($accessToken);
+        // Persist the new AuthorizationCode entity
+        $this->tokenRepository->add($code);
 
-        // Write AccessToken entity to data transformer for consumption by calling client
-        $this->dataTransformer->write($accessToken);
+        // Write AuthorizationCode entity to data transformer for consumption by calling client
+        $this->dataTransformer->write($code);
         return $this->dataTransformer->read();
     }
 

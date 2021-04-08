@@ -27,6 +27,10 @@ class DoctrineAccessTokenId extends UuidBinaryOrderedTimeType
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
+        if ($value === null) {
+            return parent::convertToPHPValue(null, $platform);
+        }
+
         $uuid = parent::convertToPHPValue($value, $platform);
         if ($uuid instanceof UuidInterface) {
             return AccessTokenId::create($uuid->toString());
@@ -43,6 +47,10 @@ class DoctrineAccessTokenId extends UuidBinaryOrderedTimeType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
+        if ($value === null) {
+            return parent::convertToDatabaseValue(null, $platform);
+        }
+
         $uuid = Uuid::fromString($value->id());
         return parent::convertToDatabaseValue($uuid, $platform);
     }

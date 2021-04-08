@@ -2,10 +2,11 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" 
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
-    <entity name="Tranquillity\Domain\Model\Auth\AccessToken" repository-class="Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineAccessTokenRepository" table="auth_tokens_access">
-        <id name="id" column="id" type="AccessTokenId"/>
-        <field name="token" type="string" nullable="false" />
+    <entity name="Tranquillity\Domain\Model\Auth\AuthorizationCode" repository-class="Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineAuthorizationCodeRepository" table="auth_codes_authorization">
+        <id name="id" column="id" type="AuthorizationCodeId"/>
+        <field name="code" type="string" nullable="false" />
         <field name="expires" type="datetime" nullable="false" />
+        <field name="redirectUri" type="string" nullable="false" />
         <field name="scope" type="datetime" nullable="true" />
         <many-to-one field="client" target-entity="Tranquillity\Domain\Model\Auth\Client">
             <join-column name="clientId" referenced-column-name="id" />

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine;
 
-use Tranquillity\Domain\Model\Auth\UserId;
+use Tranquillity\Domain\Model\Auth\RefreshTokenId;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class DoctrineUserId extends UuidBinaryOrderedTimeType
+class DoctrineRefreshTokenId extends UuidBinaryOrderedTimeType
 {
     public function getName()
     {
-        return 'UserId';
+        return 'RefreshTokenId';
     }
 
     /**
@@ -23,7 +23,7 @@ class DoctrineUserId extends UuidBinaryOrderedTimeType
      *
      * @param mixed $value
      * @param AbstractPlatform $platform
-     * @return UserId The PHP representation of the value.
+     * @return ClientId The PHP representation of the value.
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
@@ -33,9 +33,9 @@ class DoctrineUserId extends UuidBinaryOrderedTimeType
 
         $uuid = parent::convertToPHPValue($value, $platform);
         if ($uuid instanceof UuidInterface) {
-            return UserId::create($uuid->toString());
+            return RefreshTokenId::create($uuid->toString());
         }
-        return UserId::create($value);
+        return RefreshTokenId::create($value);
     }
 
     /**

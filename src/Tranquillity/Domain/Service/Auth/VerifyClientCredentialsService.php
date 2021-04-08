@@ -32,6 +32,6 @@ class VerifyClientCredentialsService
 
         // Validate the client secret
         $clientPassword = new Password($clientSecret);
-        return $this->hashingService->verify($clientPassword, $client->secret());
+        return $this->hashingService->verify($clientPassword, $client->password());
     }
 }

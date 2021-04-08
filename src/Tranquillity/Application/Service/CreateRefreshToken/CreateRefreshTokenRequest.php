@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Application\Service\CreateAccessToken;
+namespace Tranquillity\Application\Service\CreateRefreshToken;
 
 use DateTime;
 
-class CreateAccessTokenRequest
+class CreateRefreshTokenRequest
 {
     private string $token;
     private string $clientName;

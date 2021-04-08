@@ -6,6 +6,6 @@
         <id name="id" column="id" type="ClientId"/>
         <field name="name" type="string" nullable="false" />
         <field name="redirectUri" type="string" nullable="true" />
-        <embedded name="secret" class="Tranquillity\Domain\Model\Auth\HashedPassword" use-column-prefix="false" />
+        <embedded name="password" class="Tranquillity\Domain\Model\Auth\HashedPassword" use-column-prefix="false" />
     </entity>
 </doctrine-mapping>

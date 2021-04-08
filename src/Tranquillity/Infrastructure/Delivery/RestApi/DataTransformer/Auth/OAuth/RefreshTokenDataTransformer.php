@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth;
 
-use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenDataTransformer;
-use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenDataTransformer;
-use Tranquillity\Domain\Model\Auth\AccessToken;
+use Tranquillity\Application\Service\CreateRefreshToken\CreateRefreshTokenDataTransformer;
+use Tranquillity\Application\Service\FindRefreshTokenByToken\FindRefreshTokenByTokenDataTransformer;
+use Tranquillity\Domain\Model\Auth\RefreshToken;
 use Tranquillity\Domain\Validation\Notification;
 
-class AccessTokenDataTransformer implements
-    FindAccessTokenByTokenDataTransformer,
-    CreateAccessTokenDataTransformer
+class RefreshTokenDataTransformer implements
+    FindRefreshTokenByTokenDataTransformer,
+    CreateRefreshTokenDataTransformer
 {
     private array $data = [];
 
-    public function write(AccessToken $entity): void
+    public function write(RefreshToken $entity): void
     {
         $this->data = [
-            'token' => $entity->token(),
+            'refresh_token' => $entity->token(),
             'client_id' => $entity->getClientName(),
             'user_id' => $entity->getUserUsername(),
             'expires' => $entity->expires()->getTimestamp(),

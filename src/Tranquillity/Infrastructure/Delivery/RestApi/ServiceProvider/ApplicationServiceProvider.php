@@ -23,8 +23,12 @@ use Tranquillity\Domain\Event\DomainEventStore;
 use Tranquillity\Domain\Event\StoredEvent;
 use Tranquillity\Domain\Model\Auth\AccessToken;
 use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\AuthorizationCode;
+use Tranquillity\Domain\Model\Auth\AuthorizationCodeRepository;
 use Tranquillity\Domain\Model\Auth\Client;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
+use Tranquillity\Domain\Model\Auth\RefreshToken;
+use Tranquillity\Domain\Model\Auth\RefreshTokenRepository;
 use Tranquillity\Domain\Model\Auth\User;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Model\Person\Person;
@@ -52,9 +56,17 @@ class ApplicationServiceProvider extends AbstractServiceProvider
                 $em = $c->get(EntityManagerInterface::class);
                 return $em->getRepository(AccessToken::class);
             },
+            RefreshTokenRepository::class => function (ContainerInterface $c): RefreshTokenRepository {
+                $em = $c->get(EntityManagerInterface::class);
+                return $em->getRepository(RefreshToken::class);
+            },
             ClientRepository::class => function (ContainerInterface $c): ClientRepository {
                 $em = $c->get(EntityManagerInterface::class);
                 return $em->getRepository(Client::class);
+            },
+            AuthorizationCodeRepository::class => function (ContainerInterface $c): AuthorizationCodeRepository {
+                $em = $c->get(EntityManagerInterface::class);
+                return $em->getRepository(AuthorizationCode::class);
             },
             PersonRepository::class => function (ContainerInterface $c): PersonRepository {
                 $em = $c->get(EntityManagerInterface::class);

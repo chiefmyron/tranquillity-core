@@ -22,6 +22,10 @@ final class ErrorCodeEnum
     public const OAUTH_CLIENT_DOES_NOT_EXIST = '20201';
     public const OAUTH_ACCESS_TOKEN_DOES_NOT_EXIST = '20202';
     public const OAUTH_ACCESS_TOKEN_ALREADY_EXISTS = '20203';
+    public const OAUTH_REFRESH_TOKEN_DOES_NOT_EXIST = '20204';
+    public const OAUTH_REFRESH_TOKEN_ALREADY_EXISTS = '20205';
+    public const OAUTH_AUTHORIZATION_CODE_DOES_NOT_EXIST = '20206';
+    public const OAUTH_AUTHORIZATION_CODE_ALREADY_EXISTS = '20207';
 
     public static function title(string $errorCode): string
     {

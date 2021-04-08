@@ -16,7 +16,7 @@ class Client extends DomainEntity
 {
     private ClientId $id;
     private string $name;
-    private HashedPassword $secret;
+    private HashedPassword $password;
     private string $redirectUri;
 
     /**
@@ -30,12 +30,12 @@ class Client extends DomainEntity
     public function __construct(
         ClientId $id,
         string $name,
-        HashedPassword $secret,
+        HashedPassword $password,
         string $redirectUri
     ) {
         $this->id = $id;
         $this->name = $name;
-        $this->secret = $secret;
+        $this->password = $password;
         $this->redirectUri = $redirectUri;
 
         // Ensure entity is valid after creation
@@ -48,7 +48,7 @@ class Client extends DomainEntity
             );
         }
 
-        // Publish person creation
+        // Publish client creation
         DomainEventPublisher::instance()->publish(
             new ClientCreated($this->id)
         );
@@ -64,9 +64,9 @@ class Client extends DomainEntity
         return $this;
     }
 
-    private function setSecret(HashedPassword $secret): self
+    private function setPassword(HashedPassword $password): self
     {
-        $this->secret = $secret;
+        $this->password = $password;
         return $this;
     }
 
@@ -100,9 +100,9 @@ class Client extends DomainEntity
         return $this->name;
     }
 
-    public function secret(): HashedPassword
+    public function password(): HashedPassword
     {
-        return $this->secret;
+        return $this->password;
     }
 
     public function redirectUri(): string
@@ -119,9 +119,9 @@ class Client extends DomainEntity
         return $this->setName($name);
     }
 
-    public function changeSecret(HashedPassword $secret): self
+    public function changePassword(HashedPassword $password): self
     {
-        return $this->setSecret($secret);
+        return $this->setPassword($password);
     }
 
     public function changeRedirectUri(string $redirectUri): self

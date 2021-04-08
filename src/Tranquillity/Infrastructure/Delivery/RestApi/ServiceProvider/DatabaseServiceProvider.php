@@ -18,7 +18,9 @@ use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
 use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineAccessTokenId;
+use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineAuthorizationCodeId;
 use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineClientId;
+use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineRefreshTokenId;
 use Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineUserId;
 use Tranquillity\Infrastructure\Domain\Model\Person\Doctrine\DoctrinePersonId;
 use Tranquillity\Infrastructure\Persistence\Doctrine\TablePrefixExtension;
@@ -60,6 +62,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider
                 try {
                     // Register entity ID types
                     Type::addType('AccessTokenId', DoctrineAccessTokenId::class);
+                    Type::addType('RefreshTokenId', DoctrineRefreshTokenId::class);
+                    Type::addType('AuthorizationCodeId', DoctrineAuthorizationCodeId::class);
                     Type::addType('ClientId', DoctrineClientId::class);
                     Type::addType('PersonId', DoctrinePersonId::class);
                     Type::addType('UserId', DoctrineUserId::class);

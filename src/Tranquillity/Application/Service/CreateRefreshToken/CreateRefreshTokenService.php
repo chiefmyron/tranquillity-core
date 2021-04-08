@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Application\Service\CreateAccessToken;
+namespace Tranquillity\Application\Service\CreateRefreshToken;
 
 use Tranquillity\Application\Service\ApplicationService;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenRequest;
+use Tranquillity\Application\Service\Auth\CreateRefreshTokenRequest;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Exception\ValidationException;
-use Tranquillity\Domain\Model\Auth\AccessToken;
-use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\RefreshToken;
+use Tranquillity\Domain\Model\Auth\RefreshTokenRepository;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
 use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Validation\Notification;
 
-class CreateAccessTokenService implements ApplicationService
+class CreateRefreshTokenService implements ApplicationService
 {
-    private AccessTokenRepository $tokenRepository;
+    private RefreshTokenRepository $tokenRepository;
     private ClientRepository $clientRepository;
     private UserRepository $userRepository;
-    private CreateAccessTokenDataTransformer $dataTransformer;
+    private CreateRefreshTokenDataTransformer $dataTransformer;
 
     public function __construct(
-        AccessTokenRepository $tokenRepository,
+        RefreshTokenRepository $tokenRepository,
         ClientRepository $clientRepository,
         UserRepository $userRepository,
-        CreateAccessTokenDataTransformer $dataTransformer
+        CreateRefreshTokenDataTransformer $dataTransformer
     ) {
         $this->tokenRepository = $tokenRepository;
         $this->clientRepository = $clientRepository;
@@ -35,23 +35,23 @@ class CreateAccessTokenService implements ApplicationService
     }
 
     /**
-     * @param CreateAccessTokenRequest $request
+     * @param CreateRefreshTokenRequest $request
      * @return mixed
      */
     public function execute($request = null)
     {
         // Make sure request has been provided for this service
         if (is_null($request) == true) {
-            throw new \InvalidArgumentException("A '" . CreateAccessTokenRequest::class . "' must be supplied to this service!");
+            throw new \InvalidArgumentException("A '" . CreateRefreshTokenRequest::class . "' must be supplied to this service!");
         }
 
-        // Check whether the user already exists
+        // Check whether the token already exists
         $token = $this->tokenRepository->findByToken($request->token());
         if ($token != null) {
             $this->dataTransformer->writeError(
-                ErrorCodeEnum::OAUTH_ACCESS_TOKEN_ALREADY_EXISTS,
-                "An access token already exists for this value ({$request->token()})",
-                'access_token',
+                ErrorCodeEnum::OAUTH_REFRESH_TOKEN_ALREADY_EXISTS,
+                "A refresh token already exists for this value ({$request->token()})",
+                'refresh_token',
                 'token'
             );
             return $this->dataTransformer->read();
@@ -74,9 +74,9 @@ class CreateAccessTokenService implements ApplicationService
             $user = $this->userRepository->findByUsername($request->username());
         }
 
-        // Create new AccessToken entity
+        // Create new RefreshToken entity
         try {
-            $accessToken = new AccessToken(
+            $refreshToken = new RefreshToken(
                 $this->tokenRepository->nextIdentity(),
                 $request->token(),
                 $client,
@@ -89,11 +89,11 @@ class CreateAccessTokenService implements ApplicationService
             return $this->exitWithErrorCollection($ex->getErrors());
         }
 
-        // Persist the new AccessToken entity
-        $this->tokenRepository->add($accessToken);
+        // Persist the new RefreshToken entity
+        $this->tokenRepository->add($refreshToken);
 
-        // Write AccessToken entity to data transformer for consumption by calling client
-        $this->dataTransformer->write($accessToken);
+        // Write RefreshToken entity to data transformer for consumption by calling client
+        $this->dataTransformer->write($refreshToken);
         return $this->dataTransformer->read();
     }
 

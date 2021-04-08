@@ -41,8 +41,8 @@ class AccessTokenProvider implements AccessTokenInterface
     {
         $request = new CreateAccessTokenRequest(
             $oauth_token,
-            $client_id,
-            $user_id,
+            $client_id, // Actually client name
+            $user_id,   // Actually username
             (new \DateTime())->setTimestamp($expires),
             $scope
         );

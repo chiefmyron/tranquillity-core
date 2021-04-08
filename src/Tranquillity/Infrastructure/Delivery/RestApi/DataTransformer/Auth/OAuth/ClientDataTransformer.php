@@ -20,7 +20,7 @@ class ClientDataTransformer implements
         $this->data = [
             'id' => $entity->getIdValue(),
             'name' => $entity->name(),
-            'secret' => $entity->secret(),
+            'secret' => $entity->password(),
             'redirectUri' => $entity->redirectUri()
         ];
     }

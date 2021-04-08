@@ -63,7 +63,7 @@ class User extends DomainEntity
             );
         }
 
-        // Publish person creation
+        // Publish user creation
         DomainEventPublisher::instance()->publish(
             new UserCreated($this->id)
         );

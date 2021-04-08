@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth;
 
-use Tranquillity\Application\Service\FindUserByUsername\FindUserByUsernameDataTransformer;
-use Tranquillity\Application\Service\ViewUser\ViewUserDataTransformer;
-use Tranquillity\Domain\Model\Auth\User;
+use Tranquillity\Application\Service\DeleteAuthorizationCode\DeleteAuthorizationCodeDataTransformer;
+use Tranquillity\Application\Service\DeleteRefreshToken\DeleteRefreshTokenDataTransformer;
 use Tranquillity\Domain\Validation\Notification;
 
-class UserDataTransformer implements
-    ViewUserDataTransformer,
-    FindUserByUsernameDataTransformer
+class EmptyDataTransformer implements
+    DeleteRefreshTokenDataTransformer,
+    DeleteAuthorizationCodeDataTransformer
 {
     private array $data = [];
 
-    public function write(User $entity): void
+    public function write(): void
     {
-        $this->data = [
-            'user_id' => $entity->username(),
-            'scope' => ''
-        ];
+        $this->data = [];
     }
 
     public function read()
