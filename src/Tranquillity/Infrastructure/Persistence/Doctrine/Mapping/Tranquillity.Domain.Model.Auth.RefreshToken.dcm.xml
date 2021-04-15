@@ -5,8 +5,8 @@
     <entity name="Tranquillity\Domain\Model\Auth\RefreshToken" repository-class="Tranquillity\Infrastructure\Domain\Model\Auth\Doctrine\DoctrineRefreshTokenRepository" table="auth_tokens_refresh">
         <id name="id" column="id" type="RefreshTokenId"/>
         <field name="token" type="string" nullable="false" />
-        <field name="expires" type="datetime" nullable="false" />
-        <field name="scope" type="datetime" nullable="true" />
+        <field name="expires" type="datetime_immutable" nullable="false" />
+        <field name="scope" type="string" nullable="true" />
         <many-to-one field="client" target-entity="Tranquillity\Domain\Model\Auth\Client">
             <join-column name="clientId" referenced-column-name="id" />
         </many-to-one>

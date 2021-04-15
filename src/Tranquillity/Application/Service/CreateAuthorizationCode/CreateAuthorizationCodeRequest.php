@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\CreateAuthorizationCode;
 
-use DateTime;
+use DateTimeImmutable;
 
 class CreateAuthorizationCodeRequest
 {
     private string $code;
     private string $clientName;
     private ?string $username;
-    private DateTime $expires;
+    private DateTimeImmutable $expires;
     private string $redirectUri;
-    private ?string $scope;
+    private array $scopes;
 
     public function __construct(
         string $code,
         string $clientName,
         ?string $username,
-        DateTime $expires,
+        DateTimeImmutable $expires,
         string $redirectUri,
-        ?string $scope
+        array $scopes
     ) {
         $this->code = $code;
         $this->clientName = $clientName;
         $this->username = $username;
         $this->expires = $expires;
         $this->redirectUri = $redirectUri;
-        $this->scope = $scope;
+        $this->scopes = $scopes;
     }
 
     public function code(): string
@@ -46,7 +46,7 @@ class CreateAuthorizationCodeRequest
         return $this->username;
     }
 
-    public function expires(): DateTime
+    public function expires(): DateTimeImmutable
     {
         return $this->expires;
     }
@@ -56,8 +56,8 @@ class CreateAuthorizationCodeRequest
         return $this->redirectUri;
     }
 
-    public function scope(): ?string
+    public function scopes(): array
     {
-        return $this->scope;
+        return $this->scopes;
     }
 }

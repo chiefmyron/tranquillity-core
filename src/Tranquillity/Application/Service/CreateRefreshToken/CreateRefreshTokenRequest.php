@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\CreateRefreshToken;
 
-use DateTime;
+use DateTimeImmutable;
 
 class CreateRefreshTokenRequest
 {
     private string $token;
     private string $clientName;
     private ?string $username;
-    private DateTime $expires;
-    private ?string $scope;
+    private DateTimeImmutable $expires;
+    private array $scopes;
 
     public function __construct(
         string $token,
         string $clientName,
         ?string $username,
-        DateTime $expires,
-        ?string $scope
+        DateTimeImmutable $expires,
+        array $scopes
     ) {
         $this->token = $token;
         $this->clientName = $clientName;
         $this->username = $username;
         $this->expires = $expires;
-        $this->scope = $scope;
+        $this->scopes = $scopes;
     }
 
     public function token(): string
@@ -43,13 +43,13 @@ class CreateRefreshTokenRequest
         return $this->username;
     }
 
-    public function expires(): DateTime
+    public function expires(): DateTimeImmutable
     {
         return $this->expires;
     }
 
-    public function scope(): ?string
+    public function scopes(): array
     {
-        return $this->scope;
+        return $this->scopes;
     }
 }

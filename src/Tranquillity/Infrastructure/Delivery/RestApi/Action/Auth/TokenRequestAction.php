@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\Action\Auth;
 
-use OAuth2\Request;
-use OAuth2\Response;
-use OAuth2\Server;
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tranquillity\Infrastructure\Delivery\RestApi\Action\AbstractAction;
 
 class TokenRequestAction extends AbstractAction
 {
-    private Server $server;
+    private AuthorizationServer $server;
 
-    public function __construct(Server $server)
+    public function __construct(AuthorizationServer $server)
     {
         $this->server = $server;
     }
@@ -23,18 +22,13 @@ class TokenRequestAction extends AbstractAction
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         // Check token request against OAuth server
-        $serverRequest = Request::createFromGlobals();
-
-        /** @var Response */
-        $serverResponse = $this->server->handleTokenRequest($serverRequest);
-
-        // Send back response
-        $response = $response->withStatus($serverResponse->getStatusCode());
-        foreach ($serverResponse->getHttpHeaders() as $name => $value) {
-            $response = $response->withHeader($name, $value);
+        try {
+            // Attempt to response to the token request
+            return $this->server->respondToAccessTokenRequest($request, $response);
+        } catch (OAuthServerException $exception) {
+            // All instances of OAuthServerException can be formatted as HTTP responses
+            // Any other exceptions will be handled by framework error handling middleware
+            return $exception->generateHttpResponse($response);
         }
-        $response = $response->withHeader('Content-Type', 'application/json');
-        $response->getBody()->write($serverResponse->getResponseBody('json'));
-        return $response;
     }
 }

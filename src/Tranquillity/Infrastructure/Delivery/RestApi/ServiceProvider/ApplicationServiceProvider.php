@@ -7,7 +7,9 @@ namespace Tranquillity\Infrastructure\Delivery\RestApi\ServiceProvider;
 use DI;
 use DI\ContainerBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Http\Factory\Guzzle\ResponseFactory;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\Interfaces\RouteCollectorInterface;
 use Tranquillity\Application\Service\CreatePerson\CreatePersonDataTransformer;
 use Tranquillity\Application\Service\CreateUser\CreateUserDataTransformer;
@@ -101,6 +103,10 @@ class ApplicationServiceProvider extends AbstractServiceProvider
             },
             DomainEventPublisher::class => function (ContainerInterface $c): DomainEventPublisher {
                 return DomainEventPublisher::instance();
+            },
+
+            ResponseFactoryInterface::class => function (ContainerInterface $c) {
+                return new ResponseFactory();
             }
         ]);
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tranquillity\Domain\Model\Auth;
 
-use DateTime;
+use DateTimeImmutable;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Event\Auth\AuthorizationCodeCreated;
@@ -20,7 +20,7 @@ class AuthorizationCode extends DomainEntity
     private string $code;
     private Client $client;
     private ?User $user;
-    private DateTime $expires;
+    private DateTimeImmutable $expires;
     private string $redirectUri;
     private ?string $scope;
 
@@ -31,17 +31,17 @@ class AuthorizationCode extends DomainEntity
      * @param string $code
      * @param Client $client
      * @param User $user
-     * @param DateTime $expires
-     * @param string|null $scope
+     * @param DateTimeImmutable $expires
+     * @param array $scopes
      */
     public function __construct(
         AuthorizationCodeId $id,
         string $code,
         Client $client,
         ?User $user,
-        DateTime $expires,
+        DateTimeImmutable $expires,
         string $redirectUri,
-        ?string $scope
+        array $scopes
     ) {
         $this->id = $id;
         $this->code = $code;
@@ -49,7 +49,7 @@ class AuthorizationCode extends DomainEntity
         $this->user = $user;
         $this->expires = $expires;
         $this->redirectUri = $redirectUri;
-        $this->scope = $scope;
+        $this->setScopes($scopes);
 
         // Ensure entity is valid after creation
         $errors = $this->validate();
@@ -71,9 +71,14 @@ class AuthorizationCode extends DomainEntity
     // Internal setter functions
     // ****************************************************
 
-    private function setScope(string $scope): self
+    private function setScopes(array $scopes): self
     {
-        $this->scope = $scope;
+        // Convert scopes into a space-delimited string
+        if (count($scopes) > 0) {
+            $this->scope = join(" ", $scopes);
+        } else {
+            $this->scope = null;
+        }
         return $this;
     }
 
@@ -137,7 +142,7 @@ class AuthorizationCode extends DomainEntity
         return $this->user->id();
     }
 
-    public function expires(): DateTime
+    public function expires(): DateTimeImmutable
     {
         return $this->expires;
     }
@@ -147,18 +152,21 @@ class AuthorizationCode extends DomainEntity
         return $this->redirectUri();
     }
 
-    public function scope(): ?string
+    public function scopes(): array
     {
-        return $this->scope;
+        if ($this->scope == null) {
+            return [];
+        }
+        return explode(' ', $this->scope);
     }
 
     // ****************************************************
     // Public changer functions
     // ****************************************************
 
-    public function changeScope(string $scope): self
+    public function changeScope(array $scopes): self
     {
-        return $this->setScope($scope);
+        return $this->setScopes($scopes);
     }
 
     /**

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Infrastructure\Authentication\OAuth;
+namespace Tranquillity\Infrastructure\Authentication\OAuth\Repository;
 
-use OAuth2\Storage\RefreshTokenInterface;
+use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
+use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use Tranquillity\Application\Service\CreateRefreshToken\CreateRefreshTokenRequest;
 use Tranquillity\Application\Service\CreateRefreshToken\CreateRefreshTokenService;
 use Tranquillity\Application\Service\DeleteRefreshToken\DeleteRefreshTokenRequest;
@@ -13,8 +14,9 @@ use Tranquillity\Application\Service\FindRefreshTokenByToken\FindRefreshTokenByT
 use Tranquillity\Application\Service\FindRefreshTokenByToken\FindRefreshTokenByTokenService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Infrastructure\Authentication\OAuth\Entity\RefreshToken;
 
-class RefreshTokenProvider implements RefreshTokenInterface
+class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {
     private FindRefreshTokenByTokenService $viewService;
     private CreateRefreshTokenService $createService;
@@ -33,46 +35,43 @@ class RefreshTokenProvider implements RefreshTokenInterface
         $this->txnSession = $txn;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getRefreshToken($refreshToken)
+    public function getNewRefreshToken(): RefreshTokenEntityInterface
     {
-        $request = new FindRefreshTokenByTokenRequest($refreshToken);
-        return $this->viewService->execute($request);
+        return new RefreshToken();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setRefreshToken($refresh_token, $client_id, $user_id, $expires, $scope = null)
+    public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity): void
     {
-        // Build service request
         $request = new CreateRefreshTokenRequest(
-            $refresh_token,
-            $client_id,
-            $user_id,
-            (new \DateTime())->setTimestamp($expires),
-            $scope
+            $refreshTokenEntity->getIdentifier(),
+            $refreshTokenEntity->getAccessToken()->getClient()->getName(),
+            $refreshTokenEntity->getAccessToken()->getUserIdentifier(),
+            $refreshTokenEntity->getExpiryDateTime(),
+            $refreshTokenEntity->getAccessToken()->getScopes()
         );
 
         // Execute as a transaction
         $txnService = new TransactionalService($this->createService, $this->txnSession);
         $txnService->execute($request);
-        return;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsetRefreshToken($refresh_token)
+    public function revokeRefreshToken($tokenId): void
     {
         // Build service request
-        $request = new DeleteRefreshTokenRequest($refresh_token);
+        $request = new DeleteRefreshTokenRequest($tokenId);
 
         // Execute as a transaction
         $txnService = new TransactionalService($this->deleteService, $this->txnSession);
         $txnService->execute($request);
-        return;
+    }
+
+    public function isRefreshTokenRevoked($tokenId): bool
+    {
+        $request = new FindRefreshTokenByTokenRequest($tokenId);
+        $token = $this->viewService->execute($request);
+        if ($token instanceof RefreshToken) {
+            return false;
+        }
+        return true;
     }
 }

@@ -8,36 +8,31 @@ use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenDataTran
 use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenDataTransformer;
 use Tranquillity\Domain\Model\Auth\AccessToken;
 use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Infrastructure\Authentication\OAuth\Entity\AccessToken as OAuthAccessToken;
 
 class AccessTokenDataTransformer implements
     FindAccessTokenByTokenDataTransformer,
     CreateAccessTokenDataTransformer
 {
-    private array $data = [];
+    private ?OAuthAccessToken $data = null;
 
     public function write(AccessToken $entity): void
     {
-        $this->data = [
-            'token' => $entity->token(),
-            'client_id' => $entity->getClientName(),
-            'user_id' => $entity->getUserUsername(),
-            'expires' => $entity->expires()->getTimestamp(),
-            'scope' => $entity->scope()
-        ];
+        $this->data = new OAuthAccessToken();
     }
 
-    public function read(): array
+    public function read(): ?OAuthAccessToken
     {
         return $this->data;
     }
 
     public function writeError(string $code, string $detail, string $source = '', string $field = '', array $meta = []): void
     {
-        $this->data = [];
+        $this->data = null;
     }
 
     public function writeValidationError(Notification $notification): void
     {
-        $this->data = [];
+        $this->data = null;
     }
 }

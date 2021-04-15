@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Tranquillity\Application\Service\CreateAccessToken;
 
 use Tranquillity\Application\Service\ApplicationService;
-use Tranquillity\Application\Service\Auth\CreateAccessTokenRequest;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\Auth\AccessToken;
 use Tranquillity\Domain\Model\Auth\AccessTokenRepository;
+use Tranquillity\Domain\Model\Auth\ClientId;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
-use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Validation\Notification;
 
@@ -58,11 +57,11 @@ class CreateAccessTokenService implements ApplicationService
         }
 
         // Find specified OAuth Client
-        $client = $this->clientRepository->findByName($request->clientName());
+        $client = $this->clientRepository->findById(ClientId::create($request->clientId()));
         if ($client == null) {
             return $this->dataTransformer->writeError(
                 ErrorCodeEnum::OAUTH_CLIENT_DOES_NOT_EXIST,
-                "No OAuth client exists with name '{$request->clientName()}'",
+                "No OAuth client exists with ID '{$request->clientId()}'",
                 'user'
             );
             return $this->dataTransformer->read();
@@ -82,7 +81,7 @@ class CreateAccessTokenService implements ApplicationService
                 $client,
                 $user,
                 $request->expires(),
-                $request->scope()
+                $request->scopes()
             );
         } catch (ValidationException $ex) {
             // Write notifications out as errors

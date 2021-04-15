@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\ServiceProvider;
 
+use DateInterval;
 use DI\ContainerBuilder;
-use OAuth2\Server;
-use OAuth2\GrantType\ClientCredentials;
-use OAuth2\GrantType\UserCredentials;
-use OAuth2\GrantType\AuthorizationCode;
-use OAuth2\GrantType\RefreshToken;
-use OAuth2\Scope;
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\CryptKey;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
+use League\OAuth2\Server\Grant\ClientCredentialsGrant;
+use League\OAuth2\Server\Grant\PasswordGrant;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
+use League\OAuth2\Server\ResourceServer;
 use Psr\Container\ContainerInterface;
 use Tranquillity\Application\Service\CreateAccessToken\CreateAccessTokenService;
 use Tranquillity\Application\Service\CreateAuthorizationCode\CreateAuthorizationCodeService;
 use Tranquillity\Application\Service\CreateRefreshToken\CreateRefreshTokenService;
+use Tranquillity\Application\Service\DeleteAccessToken\DeleteAccessTokenService;
 use Tranquillity\Application\Service\DeleteAuthorizationCode\DeleteAuthorizationCodeService;
 use Tranquillity\Application\Service\DeleteRefreshToken\DeleteRefreshTokenService;
 use Tranquillity\Application\Service\FindAccessTokenByToken\FindAccessTokenByTokenService;
@@ -31,11 +34,12 @@ use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Service\Auth\VerifyClientCredentialsService;
 use Tranquillity\Domain\Service\Auth\VerifyUserCredentialsService;
 use Tranquillity\Domain\Service\Auth\HashingService;
-use Tranquillity\Infrastructure\Authentication\OAuth\AccessTokenProvider;
-use Tranquillity\Infrastructure\Authentication\OAuth\AuthorizationCodeProvider;
-use Tranquillity\Infrastructure\Authentication\OAuth\ClientProvider;
-use Tranquillity\Infrastructure\Authentication\OAuth\RefreshTokenProvider;
-use Tranquillity\Infrastructure\Authentication\OAuth\UserProvider;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\AccessTokenRepository as OAuthAccessTokenRepository;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\AuthorizationCodeRepository as OAuthAuthorizationCodeRepository;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\ClientRepository as OAuthClientRepository;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\RefreshTokenRepository as OAuthRefreshTokenRepository;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\ScopeRepository as OAuthScopeRepository;
+use Tranquillity\Infrastructure\Authentication\OAuth\Repository\UserRepository as OAuthUserRepository;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\AccessTokenDataTransformer;
 use Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth\AuthorizationCodeDataTransformer;
 use Tranquillity\Infrastructure\Domain\Service\Auth\NativePhpHashingService;
@@ -65,31 +69,32 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
             },
 
             // Register providers for OAuth entities
-            ClientProvider::class => function (ContainerInterface $c) {
+            OAuthClientRepository::class => function (ContainerInterface $c): OAuthClientRepository {
                 $repository = $c->get(ClientRepository::class);
                 $viewService = new FindClientByNameService($repository, new ClientDataTransformer());
                 $verifyService = new VerifyClientCredentialsService($repository, $c->get(HashingService::class));
 
-                return new ClientProvider($viewService, $verifyService);
+                return new OAuthClientRepository($viewService, $verifyService);
             },
-            UserProvider::class => function (ContainerInterface $c) {
+            OAuthUserRepository::class => function (ContainerInterface $c): OAuthUserRepository {
                 $repository = $c->get(UserRepository::class);
                 $viewService = new FindUserByUsernameService($repository, new UserDataTransformer());
                 $verifyService = new VerifyUserCredentialsService($repository, $c->get(HashingService::class));
 
-                return new UserProvider($viewService, $verifyService);
+                return new OAuthUserRepository($viewService, $verifyService);
             },
-            AccessTokenProvider::class => function (ContainerInterface $c) {
+            OAuthAccessTokenRepository::class => function (ContainerInterface $c): OAuthAccessTokenRepository {
                 $tokenRepository = $c->get(AccessTokenRepository::class);
                 $clientRepository = $c->get(ClientRepository::class);
                 $userRepository = $c->get(UserRepository::class);
                 $viewService = new FindAccessTokenByTokenService($tokenRepository, new AccessTokenDataTransformer());
                 $createService = new CreateAccessTokenService($tokenRepository, $clientRepository, $userRepository, new AccessTokenDataTransformer());
+                $deleteService = new DeleteAccessTokenService($tokenRepository, new EmptyDataTransformer());
                 $txnService = $c->get(TransactionalSession::class);
 
-                return new AccessTokenProvider($viewService, $createService, $txnService);
+                return new OAuthAccessTokenRepository($viewService, $createService, $deleteService, $txnService);
             },
-            RefreshTokenProvider::class => function (ContainerInterface $c) {
+            OAuthRefreshTokenRepository::class => function (ContainerInterface $c): OAuthRefreshTokenRepository {
                 $tokenRepository = $c->get(RefreshTokenRepository::class);
                 $clientRepository = $c->get(ClientRepository::class);
                 $userRepository = $c->get(UserRepository::class);
@@ -98,9 +103,9 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
                 $deleteService = new DeleteRefreshTokenService($tokenRepository, new EmptyDataTransformer());
                 $txnService = $c->get(TransactionalSession::class);
 
-                return new RefreshTokenProvider($viewService, $createService, $deleteService, $txnService);
+                return new OAuthRefreshTokenRepository($viewService, $createService, $deleteService, $txnService);
             },
-            AuthorizationCodeProvider::class => function (ContainerInterface $c) {
+            OAuthAuthorizationCodeRepository::class => function (ContainerInterface $c): OAuthAuthorizationCodeRepository {
                 $codeRepository = $c->get(AuthorizationCodeRepository::class);
                 $clientRepository = $c->get(ClientRepository::class);
                 $userRepository = $c->get(UserRepository::class);
@@ -109,57 +114,102 @@ class AuthenticationServiceProvider extends AbstractServiceProvider
                 $deleteService = new DeleteAuthorizationCodeService($codeRepository, new EmptyDataTransformer());
                 $txnService = $c->get(TransactionalSession::class);
 
-                return new AuthorizationCodeProvider($viewService, $createService, $deleteService, $txnService);
+                return new OAuthAuthorizationCodeRepository($viewService, $createService, $deleteService, $txnService);
+            },
+            OAuthScopeRepository::class => function (ContainerInterface $c): OAuthScopeRepository {
+                return new OAuthScopeRepository();
             },
 
-            // Register OAuth2 server with the container
-            Server::class => function (ContainerInterface $c) {
+            // Register OAuth2 authorisation server with the container
+            AuthorizationServer::class => function (ContainerInterface $c) {
                 // Get options from config
-                $config = $c->get('config');
-                $options = [
-                    'auth_code_lifetime' => $config->get('auth.oauth_auth_code_lifetime', 30), // 30 seconds
-                    'refresh_token_lifetime' => $config->get('auth.oauth_token_refresh_lifetime', 1209600) // 14 days
-                ];
+                $config = $c->get('config')->get('auth');
 
-                // Get entities used to represent OAuth objects
-                $clientStorage = $c->get(ClientProvider::class);
-                $userStorage = $c->get(UserProvider::class);
-                $accessTokenStorage = $c->get(AccessTokenProvider::class);
-                $refreshTokenStorage = $c->get(RefreshTokenProvider::class);
-                $authorisationCodeStorage = $c->get(AuthorizationCodeProvider::class);
-                /*$scopeStorage = $em->getRepository(ScopeEntity::class);*/
+                // Get OAuth entity repositories
+                $clientRepository = $c->get(OAuthClientRepository::class);
+                $userRepository = $c->get(OAuthUserRepository::class);
+                $accessTokenRepository = $c->get(OAuthAccessTokenRepository::class);
+                $refreshTokenRepository = $c->get(OAuthRefreshTokenRepository::class);
+                $authorizationCodeRepository = $c->get(OAuthAuthorizationCodeRepository::class);
+                $scopeRepository = $c->get(OAuthScopeRepository::class);
+
+                // Get security keys
+                $encryptionKey = $config['oauth_encryption_key'];
+                $privateKeyPath = realpath($config['oauth_private_key_path']);
+                $privateKey = new CryptKey($privateKeyPath, null, false);
 
                 // Create OAuth2 server
-                $storage = [
-                    'client_credentials' => $clientStorage,
-                    'user_credentials'   => $userStorage,
-                    'access_token'       => $accessTokenStorage,
-                    'refresh_token'      => $refreshTokenStorage,
-                    'authorization_code' => $authorisationCodeStorage
-                ];
-                $server = new Server($storage, $options);
-
-                // Create scope storage manager
-                //$scope = new Scope($scopeStorage);
-                //$server->setScopeUtil($scope);
-
-                // Add grant types
-                $server->addGrantType(new UserCredentials($userStorage));
-                $server->addGrantType(new AuthorizationCode($authorisationCodeStorage));
-                $server->addGrantType(
-                    new ClientCredentials(
-                        $clientStorage,
-                        ['allow_credentials_in_request_body' => $config->get('auth.oauth_client_allow_credentials_in_body', true)]
-                    )
-                );
-                $server->addGrantType(
-                    new RefreshToken(
-                        $refreshTokenStorage,
-                        ['always_issue_new_refresh_token' => $config->get('auth.oauth_token_refresh_always_issue_new', true)]
-                    )
+                $server = new AuthorizationServer(
+                    $clientRepository,
+                    $accessTokenRepository,
+                    $scopeRepository,
+                    $privateKey,
+                    $encryptionKey
                 );
 
+                // Set token lifetimes
+                $accessTokenLifetime = new DateInterval('PT' . ($config['oauth_token_access_lifetime'] ?? 3600) . 'S');
+                $refreshTokenLifetime = new DateInterval('PT' . ($config['oauth_token_refresh_lifetime'] ?? 30) . 'S');
+                $authCodeLifetime = new DateInterval('PT' . ($config['oauth_auth_code_lifetime'] ?? 600) . 'S');
+
+                // Enable client credentials grant (for trusted 3rd party applications)
+                $grantClientCredentials = new ClientCredentialsGrant();
+                $server->enableGrantType(
+                    $grantClientCredentials,
+                    $accessTokenLifetime
+                );
+
+                // Enable password credentials grant (only for trusted 1st party server applications)
+                $grantPasswordCredentials = new PasswordGrant(
+                    $userRepository,
+                    $refreshTokenRepository
+                );
+                $grantPasswordCredentials->setRefreshTokenTTL($refreshTokenLifetime);
+                $server->enableGrantType(
+                    $grantPasswordCredentials,
+                    $accessTokenLifetime
+                );
+
+                // Enable authorization code grant (for 1st and 3rd party server applications)
+                $grantAuthorizationCode = new AuthCodeGrant(
+                    $authorizationCodeRepository,
+                    $refreshTokenRepository,
+                    $authCodeLifetime
+                );
+                $grantAuthorizationCode->setRefreshTokenTTL($refreshTokenLifetime);
+                $server->enableGrantType(
+                    $grantAuthorizationCode,
+                    $accessTokenLifetime
+                );
+
+                // Enable refresh token grant
+                $grantRefreshToken = new RefreshTokenGrant(
+                    $refreshTokenRepository
+                );
+                $grantRefreshToken->setRefreshTokenTTL($refreshTokenLifetime);
+                $server->enableGrantType(
+                    $grantRefreshToken,
+                    $accessTokenLifetime
+                );
+
+                // Return configured authorisation server
                 return $server;
+            },
+
+            // Register OAuth2 authorisation server with the container
+            ResourceServer::class => function (ContainerInterface $c): ResourceServer {
+                // Get options from config
+                $config = $c->get('config')->get('auth');
+
+                // Get OAuth entity repositories
+                $accessTokenRepository = $c->get(OAuthAccessTokenRepository::class);
+
+                // Get security keys
+                $publicKeyPath = realpath($config['oauth_public_key_path']);
+                $publicKey = new CryptKey($publicKeyPath, null, false);
+
+                // Return configured resource server
+                return new ResourceServer($accessTokenRepository, $publicKey);
             }
         ]);
     }

@@ -8,36 +8,31 @@ use Tranquillity\Application\Service\CreateRefreshToken\CreateRefreshTokenDataTr
 use Tranquillity\Application\Service\FindRefreshTokenByToken\FindRefreshTokenByTokenDataTransformer;
 use Tranquillity\Domain\Model\Auth\RefreshToken;
 use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Infrastructure\Authentication\OAuth\Entity\RefreshToken as OAuthRefreshToken;
 
 class RefreshTokenDataTransformer implements
     FindRefreshTokenByTokenDataTransformer,
     CreateRefreshTokenDataTransformer
 {
-    private array $data = [];
+    private ?OAuthRefreshToken $data = null;
 
     public function write(RefreshToken $entity): void
     {
-        $this->data = [
-            'refresh_token' => $entity->token(),
-            'client_id' => $entity->getClientName(),
-            'user_id' => $entity->getUserUsername(),
-            'expires' => $entity->expires()->getTimestamp(),
-            'scope' => $entity->scope()
-        ];
+        $this->data = new OAuthRefreshToken();
     }
 
-    public function read(): array
+    public function read(): OAuthRefreshToken
     {
         return $this->data;
     }
 
     public function writeError(string $code, string $detail, string $source = '', string $field = '', array $meta = []): void
     {
-        $this->data = [];
+        $this->data = null;
     }
 
     public function writeValidationError(Notification $notification): void
     {
-        $this->data = [];
+        $this->data = null;
     }
 }

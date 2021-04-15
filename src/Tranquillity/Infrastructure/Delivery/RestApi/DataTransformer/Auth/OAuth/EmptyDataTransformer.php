@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tranquillity\Infrastructure\Delivery\RestApi\DataTransformer\Auth\OAuth;
 
+use Tranquillity\Application\Service\DeleteAccessToken\DeleteAccessTokenDataTransformer;
 use Tranquillity\Application\Service\DeleteAuthorizationCode\DeleteAuthorizationCodeDataTransformer;
 use Tranquillity\Application\Service\DeleteRefreshToken\DeleteRefreshTokenDataTransformer;
 use Tranquillity\Domain\Validation\Notification;
 
 class EmptyDataTransformer implements
+    DeleteAccessTokenDataTransformer,
     DeleteRefreshTokenDataTransformer,
     DeleteAuthorizationCodeDataTransformer
 {

@@ -5,8 +5,12 @@ return [
     'password_options' => [
         'cost' => env('AUTH_PASSWORD_COST', 10)
     ],
-    'oauth_client_allow_credentials_in_body' => env('AUTH_CLIENT_ALLOW_CREDENTIALS_IN_BODY', true),  // Allow client credentials in request body by default
-    'oauth_auth_code_lifetime' => env('AUTH_OAUTH_AUTH_CODE_LIFETIME', 30),  // Default to 30 seconds
-    'oauth_token_refresh_lifetime' => env('AUTH_OAUTH_TOKEN_REFRESH_LIFETIME', 1209600),  // Default to 14 days
-    'oauth_token_refresh_always_issue_new' => env('AUTH_OAUTH_TOKEN_REFRESH_ALWAYS_ISSUE_NEW', true)  // Always issue new refresh tokens by default
+
+    // OAuth settings
+    'oauth_token_access_lifetime' => env('OAUTH_TOKEN_ACCESS_LIFETIME', 3600),
+    'oauth_token_refresh_lifetime' => env('OAUTH_TOKEN_REFRESH_LIFETIME', 30),
+    'oauth_auth_code_lifetime' => env('OAUTH_AUTH_CODE_LIFETIME', 600),
+    'oauth_private_key_path' => env('OAUTH_PRIVATE_KEY_PATH', '../tranquillity.private.key'),
+    'oauth_public_key_path' => env('OAUTH_PUBLIC_KEY_PATH', '../tranquillity.public.key'),
+    'oauth_encryption_key' => env('OAUTH_ENCRYPTION_KEY', '1')
 ];

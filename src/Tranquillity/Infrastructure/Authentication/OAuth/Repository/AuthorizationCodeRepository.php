@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Infrastructure\Authentication\OAuth;
+namespace Tranquillity\Infrastructure\Authentication\OAuth\Repository;
 
-use OAuth2\Storage\AuthorizationCodeInterface;
+use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
+use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 use Tranquillity\Application\Service\CreateAuthorizationCode\CreateAuthorizationCodeRequest;
 use Tranquillity\Application\Service\CreateAuthorizationCode\CreateAuthorizationCodeService;
 use Tranquillity\Application\Service\DeleteAuthorizationCode\DeleteAuthorizationCodeRequest;
@@ -13,8 +14,9 @@ use Tranquillity\Application\Service\FindAuthorizationCodeByCode\FindAuthorizati
 use Tranquillity\Application\Service\FindAuthorizationCodeByCode\FindAuthorizationCodeByCodeService;
 use Tranquillity\Application\Service\TransactionalService;
 use Tranquillity\Application\Service\TransactionalSession;
+use Tranquillity\Infrastructure\Authentication\OAuth\Entity\AuthorizationCode;
 
-class AuthorizationCodeProvider implements AuthorizationCodeInterface
+class AuthorizationCodeRepository implements AuthCodeRepositoryInterface
 {
     private FindAuthorizationCodeByCodeService $viewService;
     private CreateAuthorizationCodeService $createService;
@@ -33,28 +35,21 @@ class AuthorizationCodeProvider implements AuthorizationCodeInterface
         $this->txnSession = $txn;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getAuthorizationCode($code)
+    public function getNewAuthCode()
     {
-        $request = new FindAuthorizationCodeByCodeRequest($code);
-        return $this->viewService->execute($request);
+        return new AuthorizationCode();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null)
+    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity): void
     {
         // Build service request
         $request = new CreateAuthorizationCodeRequest(
-            $code,
-            $client_id,
-            $user_id,
-            (new \DateTime())->setTimestamp($expires),
-            $redirect_uri,
-            $scope
+            $authCodeEntity->getIdentifier(),
+            $authCodeEntity->getClient()->getIdentifier(),
+            $authCodeEntity->getUserIdentifier(),
+            $authCodeEntity->getExpiryDateTime(),
+            $authCodeEntity->getRedirectUri(),
+            $authCodeEntity->getScopes()
         );
 
         // Execute as a transaction
@@ -63,17 +58,20 @@ class AuthorizationCodeProvider implements AuthorizationCodeInterface
         return;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function expireAuthorizationCode($code)
+    public function revokeAuthCode($codeId): void
     {
         // Build service request
-        $request = new DeleteAuthorizationCodeRequest($code);
+        $request = new DeleteAuthorizationCodeRequest($codeId);
 
         // Execute as a transaction
         $txnService = new TransactionalService($this->deleteService, $this->txnSession);
         $txnService->execute($request);
         return;
+    }
+
+    public function isAuthCodeRevoked($codeId): bool
+    {
+        $request = new FindAuthorizationCodeByCodeRequest($codeId);
+        return $this->viewService->execute($request);
     }
 }

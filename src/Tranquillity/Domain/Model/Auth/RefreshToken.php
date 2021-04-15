@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tranquillity\Domain\Model\Auth;
 
-use DateTime;
+use DateTimeImmutable;
 use Tranquillity\Domain\Enum\EntityTypeEnum;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Event\Auth\RefreshTokenCreated;
@@ -20,7 +20,7 @@ class RefreshToken extends DomainEntity
     private string $token;
     private Client $client;
     private ?User $user;
-    private DateTime $expires;
+    private DateTimeImmutable $expires;
     private ?string $scope;
 
     /**
@@ -30,23 +30,23 @@ class RefreshToken extends DomainEntity
      * @param string $token
      * @param Client $client
      * @param User $user
-     * @param DateTime $expires
-     * @param string|null $scope
+     * @param DateTimeImmutable $expires
+     * @param array $scopes
      */
     public function __construct(
         RefreshTokenId $id,
         string $token,
         Client $client,
         ?User $user,
-        DateTime $expires,
-        ?string $scope
+        DateTimeImmutable $expires,
+        array $scopes
     ) {
         $this->id = $id;
         $this->token = $token;
         $this->client = $client;
         $this->user = $user;
         $this->expires = $expires;
-        $this->scope = $scope;
+        $this->setScopes($scopes);
 
         // Ensure entity is valid after creation
         $errors = $this->validate();
@@ -68,9 +68,14 @@ class RefreshToken extends DomainEntity
     // Internal setter functions
     // ****************************************************
 
-    private function setScope(string $scope): self
+    private function setScopes(array $scopes): self
     {
-        $this->scope = $scope;
+        // Convert scopes into a space-delimited string
+        if (count($scopes) > 0) {
+            $this->scope = join(" ", $scopes);
+        } else {
+            $this->scope = null;
+        }
         return $this;
     }
 
@@ -134,23 +139,26 @@ class RefreshToken extends DomainEntity
         return $this->user->id();
     }
 
-    public function expires(): DateTime
+    public function expires(): DateTimeImmutable
     {
         return $this->expires;
     }
 
-    public function scope(): ?string
+    public function scopes(): array
     {
-        return $this->scope;
+        if ($this->scope == null) {
+            return [];
+        }
+        return explode(' ', $this->scope);
     }
 
     // ****************************************************
     // Public changer functions
     // ****************************************************
 
-    public function changeScope(string $scope): self
+    public function changeScope(array $scopes): self
     {
-        return $this->setScope($scope);
+        return $this->setScopes($scopes);
     }
 
     /**

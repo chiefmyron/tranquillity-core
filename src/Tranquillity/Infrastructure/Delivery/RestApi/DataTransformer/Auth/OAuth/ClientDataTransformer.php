@@ -8,24 +8,25 @@ use Tranquillity\Application\Service\FindClientByName\FindClientByNameDataTransf
 use Tranquillity\Application\Service\ViewClient\ViewClientDataTransformer;
 use Tranquillity\Domain\Model\Auth\Client;
 use Tranquillity\Domain\Validation\Notification;
+use Tranquillity\Infrastructure\Authentication\OAuth\Entity\Client as OAuthClient;
 
 class ClientDataTransformer implements
     ViewClientDataTransformer,
     FindClientByNameDataTransformer
 {
-    private array $data = [];
+    private OAuthClient $data;
 
     public function write(Client $entity): void
     {
-        $this->data = [
-            'id' => $entity->getIdValue(),
-            'name' => $entity->name(),
-            'secret' => $entity->password(),
-            'redirectUri' => $entity->redirectUri()
-        ];
+        $this->data = new OAuthClient(
+            $entity->getIdValue(),
+            $entity->name(),
+            $entity->redirectUri(),
+            true
+        );
     }
 
-    public function read(): array
+    public function read(): OAuthClient
     {
         return $this->data;
     }

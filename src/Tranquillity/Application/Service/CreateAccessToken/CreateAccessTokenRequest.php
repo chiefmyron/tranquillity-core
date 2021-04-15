@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace Tranquillity\Application\Service\CreateAccessToken;
 
-use DateTime;
+use DateTimeImmutable;
 
 class CreateAccessTokenRequest
 {
     private string $token;
-    private string $clientName;
+    private string $clientId;
     private ?string $username;
-    private DateTime $expires;
-    private ?string $scope;
+    private DateTimeImmutable $expires;
+    private array $scopes;
 
     public function __construct(
         string $token,
-        string $clientName,
+        string $clientId,
         ?string $username,
-        DateTime $expires,
-        ?string $scope
+        DateTimeImmutable $expires,
+        array $scopes
     ) {
         $this->token = $token;
-        $this->clientName = $clientName;
+        $this->clientId = $clientId;
         $this->username = $username;
         $this->expires = $expires;
-        $this->scope = $scope;
+        $this->scopes = $scopes;
     }
 
     public function token(): string
@@ -33,9 +33,9 @@ class CreateAccessTokenRequest
         return $this->token;
     }
 
-    public function clientName(): string
+    public function clientId(): string
     {
-        return $this->clientName;
+        return $this->clientId;
     }
 
     public function username(): ?string
@@ -43,13 +43,13 @@ class CreateAccessTokenRequest
         return $this->username;
     }
 
-    public function expires(): DateTime
+    public function expires(): DateTimeImmutable
     {
         return $this->expires;
     }
 
-    public function scope(): ?string
+    public function scopes(): array
     {
-        return $this->scope;
+        return $this->scopes;
     }
 }

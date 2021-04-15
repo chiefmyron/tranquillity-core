@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tranquillity\Infrastructure\Authentication\OAuth;
+namespace Tranquillity\Infrastructure\Authentication\OAuth\Repository;
 
-use OAuth2\Storage\UserCredentialsInterface;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Repositories\UserRepositoryInterface;
 use Tranquillity\Application\Service\FindUserByUsername\FindUserByUsernameRequest;
 use Tranquillity\Application\Service\FindUserByUsername\FindUserByUsernameService;
 use Tranquillity\Domain\Service\Auth\VerifyUserCredentialsService;
 
-class UserProvider implements UserCredentialsInterface
+class UserRepository implements UserRepositoryInterface
 {
     private FindUserByUsernameService $viewService;
     private VerifyUserCredentialsService $verifyService;
@@ -20,20 +21,16 @@ class UserProvider implements UserCredentialsInterface
         $this->verifyService = $verifyService;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getUserDetails($username): array
+    public function getUserEntityByUserCredentials($username, $password, $grantType, ClientEntityInterface $clientEntity)
     {
+        // Validate credentials
+        $valid = $this->verifyService->validate($username, $password);
+        if ($valid === false) {
+            return null;
+        }
+
+        // If credentials are valid, return user details
         $request = new FindUserByUsernameRequest($username);
         return $this->viewService->execute($request);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function checkUserCredentials($username, $password): bool
-    {
-        return $this->verifyService->validate($username, $password);
     }
 }

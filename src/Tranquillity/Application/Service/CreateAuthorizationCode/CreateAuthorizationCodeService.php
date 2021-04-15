@@ -10,7 +10,6 @@ use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\Auth\AuthorizationCode;
 use Tranquillity\Domain\Model\Auth\AuthorizationCodeRepository;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
-use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Validation\Notification;
 
@@ -82,7 +81,7 @@ class CreateAuthorizationCodeService implements ApplicationService
                 $user,
                 $request->expires(),
                 $request->redirectUri(),
-                $request->scope()
+                $request->scopes()
             );
         } catch (ValidationException $ex) {
             // Write notifications out as errors

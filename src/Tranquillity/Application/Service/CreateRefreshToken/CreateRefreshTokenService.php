@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Tranquillity\Application\Service\CreateRefreshToken;
 
 use Tranquillity\Application\Service\ApplicationService;
-use Tranquillity\Application\Service\Auth\CreateRefreshTokenRequest;
 use Tranquillity\Domain\Enum\ErrorCodeEnum;
 use Tranquillity\Domain\Exception\ValidationException;
 use Tranquillity\Domain\Model\Auth\RefreshToken;
 use Tranquillity\Domain\Model\Auth\RefreshTokenRepository;
 use Tranquillity\Domain\Model\Auth\ClientRepository;
-use Tranquillity\Domain\Model\Auth\UserId;
 use Tranquillity\Domain\Model\Auth\UserRepository;
 use Tranquillity\Domain\Validation\Notification;
 
@@ -82,7 +80,7 @@ class CreateRefreshTokenService implements ApplicationService
                 $client,
                 $user,
                 $request->expires(),
-                $request->scope()
+                $request->scopes()
             );
         } catch (ValidationException $ex) {
             // Write notifications out as errors
