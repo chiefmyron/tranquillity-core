@@ -80,7 +80,7 @@ abstract class AbstractEnum
      * @return boolean           True if value or label is defined in the enumeration, otherwise false
      * @throws \Exception
      */
-    final private static function validateEnumAspect($mode, $searchTerm, $className = null)
+    private static function validateEnumAspect($mode, $searchTerm, $className = null)
     {
         // If no class name is specified use the current class
         if ($className === null) {
