@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tranquillity\Infrastructure\Output\JsonApi\ResourceObject;
 
 use Tranquillity\Domain\Enum\EntityTypeEnum;
-use Tranquillity\Domain\Model\User\User;
+use Tranquillity\Domain\Model\Auth\User;
 
 class UserResourceObject extends AbstractResourceObject
 {
